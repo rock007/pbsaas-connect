@@ -1,0 +1,101 @@
+package com.pbsaas.web.webserver;
+
+import com.paintfriend.backend.utils.LogUtils;
+import com.paintfriend.chat.proto.GroupListRspOuterClass.GroupBuff;
+import com.paintfriend.chat.proto.GroupListRspOuterClass.GroupListRsp;
+import com.paintfriend.chat.proto.PaintFriend;
+
+import com.google.protobuf.Any;
+import com.pbsaas.connect.db.entity.ChatGroup;
+import com.pbsaas.connect.db.service.FriendService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
+
+
+@Path("/")
+@Component
+public class GetMyGroupsCgi  {
+
+	private static final Logger logger = LoggerFactory.getLogger(GetMyGroupsCgi.class);
+
+	@Autowired
+	private FriendService friendService;
+	
+	@Path("/get-my-groups")
+    @POST()
+    @Consumes("application/octet-stream")
+    @Produces("application/octet-stream")
+    public Response get_my_groups(InputStream is) {
+		
+		int result=1;
+    	String msg="获取数据成功";
+    	GroupListRsp groupListBuf=GroupListRsp.newBuilder().build();
+    	
+        try {
+        	
+            final PaintFriend.ReqBody request = PaintFriend.ReqBody.parseFrom(is);
+            
+            logger.info(LogUtils.format("get-my-groups request from user=%s, text=%s", request.getUid(), request.getText()));
+
+			List<ChatGroup> list= friendService.getGroupsByUserId(request.getUid());
+			
+			List<GroupBuff> groupList = new LinkedList<GroupBuff>();
+			
+			for(ChatGroup item:list){
+				
+				GroupBuff one=GroupBuff.newBuilder()
+						.setGroupName(item.getGroup_name())
+						.setGroupLevel(item.getGroup_level())
+						.setGroupId(item.getId().intValue())
+						.setNote(item.getNote())
+						.setOwnUser(item.getOwn_user())
+						.setRemarks(item.getRemarks())
+						.setStatus(item.getStatus())
+						.build();
+				
+				groupList.add(one);
+			}
+			
+			groupListBuf=GroupListRsp.newBuilder()
+					.addAllGroups(groupList)
+					.build();
+           
+        } catch (Exception e) {
+            logger.error(LogUtils.format("%s", e));
+            e.printStackTrace();
+
+            result=-100;
+        	msg="获取数据失败，系统出现异常";
+        }
+
+        final PaintFriend.RespBody response = PaintFriend.RespBody.newBuilder()
+        		.setActid(PaintFriend.CmdID.CMD_ID_MY_FRIENDS_VALUE)
+        		.setResult(result)
+        		.setMsg(msg)
+        		.setData(Any.pack(groupListBuf))
+        		.build();
+        
+        final StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException {
+                response.writeTo(os);
+            }
+        };
+        return Response.ok(stream).build();
+        
+    }
+}

@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package com.pbsaas.connect.proto;
+
+message GroupBuff {
+	
+	required int32 groupId = 1;
+	
+	required string groupName = 2;
+	
+	optional int32 groupLevel = 3;
+	
+	optional string note = 4;
+	
+	optional string remarks = 5;
+	
+	required string ownUser = 6;
+	
+	required int32 status  = 7;
+	
+	optional string  createDate = 8;
+	
+}
+
+message GroupListRsp {
+
+    repeated GroupBuff groups = 1;
+}

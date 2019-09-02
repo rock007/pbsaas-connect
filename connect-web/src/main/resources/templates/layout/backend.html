@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+  <head>
+  	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">后台管理</title>
+	<link rel="stylesheet" href="../plugins/font-awesome/css/font-awesome.css"/>
+    <link href="../plugins/winstrap/css/winstrap.css" rel="stylesheet" />
+	<link href="../css/site.css" rel="stylesheet" />    
+  </head>
+  <body>
+    <div th:replace="layout/header::header">
+      ... header
+    </div>
+    
+    <div class="container-flow" style="padding-top: 55px;" >
+      
+      <div class="row">
+		<div class="col-md-4">
+	
+		<ul >
+				<li>
+					<a href="/backend/">
+						<i class="fa fa-dashboard"></i>
+						<span class="hidden-xs">后台</span>
+					</a>
+				</li>				  
+				<li >
+					<a href="#" class="dropdown-toggle">
+						<i class="fa fa-list-alt"></i>
+						<span class="hidden-xs">博客</span>
+					</a>
+					<ul >
+						<li><a class="ajax-link" href="/article/article-list.html">列表</a></li>
+						<li><a class="ajax-link" href="#">评论</a></li>
+						<li><a class="ajax-link" href="#">分类</a></li>							
+					</ul>
+				</li>
+				<li >
+					<a href="#" class="dropdown-toggle">
+						<i class="fa fa-area-chart"></i>
+						<span class="hidden-xs">商城</span>
+					</a>
+					<ul >
+						<li><a class="ajax-link" href="/shop/products-list.html">商品管理</a></li>						
+						<li><a class="ajax-link" href="/shop/orders-list.html">订单列表</a></li>
+						<li><a class="ajax-link" href="#">库存</a></li>
+					</ul>
+				</li>				
+				<li >
+					<a href="#" class="dropdown-toggle">
+						<i class="fa fa-book"></i>
+						<span class="hidden-xs">基本信息</span>
+					</a>
+					<ul >
+						<li><a class="ajax-link" href="#">信息修改</a></li>
+						<li><a class="ajax-link" href="#">修改密码</a></li>
+						<li><a class="ajax-link" href="#">注销</a></li>
+					</ul>
+				</li>
+			</ul>
+			
+			
+		</div>	
+	<div class="col-md-20">
+	<div class="row">
+  		<div class="col-xs-24">
+  			<ol class="breadcrumb">
+        		<li  th:each="nav,indexStat : ${navs}" th:class="${ #strings.isEmpty(nav.value)?'active':''}">
+        			
+        			<a th:if="${not #strings.isEmpty(nav.value) }" href="#" th:href="${nav.value}" th:text="${nav.key}">Parent page</a>
+        			
+        			<span th:if="${ #strings.isEmpty(nav.value) }" th:text="${nav.key}">未知</span>
+        			
+        		</li>
+    		</ol>
+    		
+    		 <div class="alert-stack">
+    
+    <div class="alert alert-warning with-glyph alert-dismissible fade in hide" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">
+                <i class="glyph glyph-cancel"></i>
+            </span>
+        </button>
+        <span class="alert-glyph">
+            <i class="glyph-info"></i>
+        </span>
+        <div class="alert-title">Danger alert with glyph example</div>
+        <div class="row">
+            <div class="col-md-20">
+                <p>This is a danger inline alert with an glyph. Want to know more about what glyphs you can use?</p>
+            </div>
+            <div class="col-md-4">
+                <p>
+                    <a href="#" class="visible-xs-inline visible-sm-inline hidden-md">Click here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+        <!-- We can stack other alert components here -->
+    </div>
+        
+  		</div>  		
+	</div>
+	
+      		<div layout:fragment="content">
+        		这是母版内容页
+      		</div>
+		
+		</div>
+	</div>
+       
+    </div>
+    <div th:replace="layout/footer::footer">&copy; 2014 The Static Templates</div>
+    
+    <script src="../plugins/jquery/jquery.min.js"></script>
+	<script src="../plugins/winstrap/js/vendor/bootstrap.min.js"></script>
+	<script src="../plugins/winstrap/js/app.js"></script>
+    
+	<script src="../js/site.js"></script>
+    
+    <th:block layout:fragment="script"></th:block>
+    
+    <a href="#top" class="back-to-top">
+        	<i class="glyph glyph-up"></i>
+        	<span class="sr-only">Back to top</span>
+	</a>
+  </body>
+</html>

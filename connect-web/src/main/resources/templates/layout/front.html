@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="http://www.w3.org/2005/Atom">
+  <head>
+  	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE"></title>
+    <!--[if lt IE 9]>
+    <script src="/plugins/html5shiv/html5shiv.min.js"></script>
+    <script src="/plugins/respond/respond.min.js"></script>
+    <![endif]-->
+    <link href="/plugins/winstrap/css/winstrap.css" rel="stylesheet" />
+	<link href="/css/site.css" rel="stylesheet" />    
+  </head>
+  <body>
+    <div th:replace="layout/header::header">
+      ... header
+    </div>
+    
+    <div class="container" style="padding-top: 55px;" >
+    <div class="row">
+  		<div class="col-xs-24">
+  			<ol class="breadcrumb hide">
+        		<li><a href="#">Parent page</a></li>
+        		<li><a href="#">Child page</a></li>
+        		<li><a href="#">Section</a></li>
+        		<li class="active">Current</li>
+    		</ol>
+    		
+    		 <div class="alert-stack">
+    
+    <div class="alert alert-warning with-glyph alert-dismissible fade in hide" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">
+                <i class="glyph glyph-cancel"></i>
+            </span>
+        </button>
+        <span class="alert-glyph">
+            <i class="glyph-info"></i>
+        </span>
+        <div class="alert-title">Danger alert with glyph example</div>
+        <div class="row">
+            <div class="col-md-20">
+                <p>This is a danger inline alert with an glyph. Want to know more about what glyphs you can use?</p>
+            </div>
+            <div class="col-md-4">
+                <p>
+                    <a href="#" class="pull-right hidden-xs hidden-sm">Click here</a>
+                    <a href="#" class="visible-xs-inline visible-sm-inline hidden-md">Click here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+        <!-- We can stack other alert components here -->
+    </div>
+        
+  		</div>  		
+	</div>
+	
+      <div layout:fragment="content">
+        	这是母版内容页
+      </div>
+    </div>
+    <div th:replace="layout/footer::footer">&copy; 2015 power by sam  </div>
+    
+    <script src="/plugins/jquery/jquery.min.js"></script>
+	<script src="/plugins/winstrap/js/vendor/bootstrap.min.js"></script>
+	<script src="/plugins/winstrap/js/app.js"></script>
+    
+	<script src="/js/site.js"></script>
+    
+    <th:block layout:fragment="script"></th:block>
+    
+  </body>
+</html>

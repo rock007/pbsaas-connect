@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<title>抱歉，出错了</title>
+	<link href="/plugins/winstrap/css/winstrap.css" rel="stylesheet" />
+	<link href="/css/site.css" rel="stylesheet" />  
+</head>
+<body>
+
+ <div class="container">
+      <div class="page-header">
+        <h1>opoos,状态：<span th:text="${status}"></span></h1>
+      </div>
+      
+      <ul class="list-unstyled">
+		<li>
+			url:<span th:text="${url}"></span>
+		</li>
+		<li>
+			错误信息: <p class="bg-danger" th:utext="${errorMessage}">Error java.lang.NullPointerException</p>
+		</li>
+	  </ul>
+		<p class="text-right"> 返回 <a href="/">首页</a> </p>
+      
+    </div>
+    <div class="footer">
+      <div class="container">
+        <p class="text-right text-muted" th:text="'时间'+${time}">datetime</p>
+      </div>
+    </div>
+    
+</body>
+</html>

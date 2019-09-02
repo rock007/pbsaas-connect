@@ -1,0 +1,96 @@
+
+server:
+  port: 10012
+  session:
+    timeout: 36000
+  error:
+    whitelabel:
+     enabled: false
+
+spring:
+  application:
+    name: paintFriend-backend
+    index: 1
+    mvc:
+      favicon:
+         enabled: false
+      date-format: yyyy-MM-dd
+    main:
+      banner-mode: CONSOLE
+
+    jackson:
+      date-format: yyyy-MM-dd HH:mm:ss
+      time-zone: Asia/Shanghai
+
+  thymeleaf:
+      check-template-location: true
+      prefix: classpath:/templates/
+      suffix: .html
+      mode: HTML5
+      encoding: UTF-8
+      content-type: text/html
+      cache: false
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/paintfriend?autoReconnect=true&characterEncoding=utf-8&useUnicode=true&useSSL=false&serverTimezone=GMT
+    username: root
+    password: 123456
+    driverClassName: com.mysql.cj.jdbc.Driver
+
+  dbcp:
+    validation-query:
+      validation-query: select now()
+    test-on-borrow: true
+    test-on-return: true
+
+  jpa:
+    show-sql: true
+    database=MYSQL:
+    hibernate:
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+         dialect : org.hibernate.dialect.MySQL5Dialect
+
+security:
+  oauth2:
+    filter-order: 3
+    client:
+      client-id: vole
+      client-secret: 123456
+  resource:
+    jwt:
+    key-uri: ${security.auth.server}/oauth/token_key  #解析jwt令牌所需要密钥的地址
+
+ignore:
+  urls:
+    - /authentication/**
+    - /css/*.css
+    - /js/*.js
+    - /actuator/**
+    - /hystrix/**
+    - /metrics/**
+    - /loggers/**
+    - /mobile/cookie
+
+
+logging:
+  path: D:\\temp\\logs
+  file: paintfriend_backend.log
+  level:
+    root: DEBUG
+    #org.springframework= WARN
+    #org.thymeleaf=ERROR
+    #com.paintfriend.backend = DEBUG
+
+application:
+  uploadDir: upload
+  uploadRootDir: D:\\temp\\paintfriend\\files_dir
+
+authentication:
+   oauth:
+    clientid: pf_app
+    secret: secret
+    tokenValidityInSeconds: 2592000

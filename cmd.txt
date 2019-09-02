@@ -1,0 +1,39 @@
+If you are using Gradle, you can run the application 
+using ./gradlew bootRun. Or you can build the JAR file using ./gradlew build. Then you can run the JAR file:
+
+java -jar build/libs/gs-rest-service-0.1.0.jar
+
+
+获取access_token  URL ：
+
+http://localhost:10012/oauth/token?client_id=pf_app&client_secret=secret&grant_type=password&username=admin&password=123456
+这时候会返回一个access_token：
+
+{"access_token":"4219a91f-45d5-4a07-9e8e-3acbadd0c23e","token_type":"bearer","refresh_token":"d41df9fd-3d36-4a20-b0b7-1a1883c7439d","expires_in":43199,"scope":"read write trust"}
+这之后再拿着这个access_token去访问资源：
+
+http://localhost:8080/AOuth/admin?access_token=4219a91f-45d5-4a07-9e8e-3acbadd0c23e
+刷新access_token：
+
+http://localhost:10012/oauth/token?client_id=pf_app&client_secret=secret&grant_type=refresh_token&refresh_token=ad18fc89e1424278b675ca05bf8afbb3
+
+==begin !!!
+http://localhost:10012/oauth/authorize?response_type=code&client_id=pf_app&redirect_uri=http://localhost:10012 
+
+
+===
+curl -X POST http://localhost:10012/oauth/authorize --data "username=admin&password=123456" 
+
+
+curl -X POST pf_app:@localhost:10012/oauth/token -d "grant_type=password" -d "client_id=pf_admin" -d "username=admin" -d "password=123456"
+
+
+curl -X POST -d "client_id=pf_app&amp;client_secret=secret_1&amp;grant_type=password&amp;username=admin&amp;password=123456" http://localhost:10012/oauth/token
+
+===ook client_id=admin???
+curl -X POST -d 'grant_type=password&username=admin&password=123456' --user 'admin' localhost:10012/oauth/token
+
+
+
+==20180104 坚持mars，短链接 长链接混合使用
+==20180417 用户不使用id作为数据库关联主键，改用username[account_name]

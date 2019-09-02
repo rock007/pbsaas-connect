@@ -1,0 +1,12 @@
+# Created by .ignore support plugin 
+
+local.properties
+.idea/**
+.gradle
+.settings/**
+bin
+build
+out
+.gradle/**
+.idea
+generated

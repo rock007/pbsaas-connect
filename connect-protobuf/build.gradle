@@ -1,0 +1,50 @@
+apply plugin: 'com.google.protobuf'
+
+version '0.0.1-SNAPSHOT'
+
+sourceSets {
+    main {
+        proto {
+            srcDir 'src/main/proto'
+        }
+        java {
+            srcDir 'src/main/java'
+            srcDir 'src/generated/main/java'
+        }
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        proto {
+            // In addition to the default 'src/test/proto'
+            srcDir 'src/test/protocolbuffers'
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        // Download from repositories
+        artifact = 'com.google.protobuf:protoc:3.1.0'
+    }
+    plugins {
+        javalite {
+            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+        }
+    }
+
+    generatedFilesBaseDir = "$projectDir/src/generated"
+}
+
+clean {
+    delete protobuf.generatedFilesBaseDir
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile 'com.google.protobuf:protobuf-java:3.1.0'
+    compile 'com.google.protobuf:protobuf-java-util:3.1.0'
+    compile 'com.googlecode.protobuf-java-format:protobuf-java-format:1.4'
+
+}
