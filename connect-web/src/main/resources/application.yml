@@ -9,7 +9,7 @@ server:
 
 spring:
   application:
-    name: paintFriend-backend
+    name: web
     index: 1
     mvc:
       favicon:

@@ -1,6 +1,3 @@
-server:
-  port: 10002
-
 spring:
   application:
     name: connect-server
@@ -19,4 +16,11 @@ eureka:
       preferIpAddress: true
     
     
-    
+mars:
+  connect:
+    port: 10013
+    ip: 127.0.0.1
+    fileServer: http://127.0.0.1/upload
+  hazelcast:
+    backup-count: 1
+    time-to-live-seconds: 3600

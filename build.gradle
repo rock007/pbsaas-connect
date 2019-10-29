@@ -5,6 +5,7 @@ buildscript {
     ext {
         springBootVersion = '2.1.6.RELEASE'
         springCloudVersion ='Greenwich.SR2'
+        hazelcastVersion='3.9.4'
         // JDK 版本
         JDKVersion = 1.8
         // 编码

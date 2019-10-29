@@ -15,6 +15,7 @@ import com.pbsaas.connect.server.mars.connect.SessionPool;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -30,11 +31,12 @@ import java.util.TimerTask;
  * @author sam
  *
  */
-@Component
+//@Component
 public class MarsServer  implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(MarsServer.class);
-	
+
+    @Value("${mars.connect.port}")
     private int port=10013;
 
     private EventLoopGroup bossGroup;
@@ -82,7 +84,7 @@ public class MarsServer  implements CommandLineRunner {
             			.sync();
         }
         catch (Exception e) {
-        	logger.error("ProxyServer:start", e);
+        	logger.error("MarsServer:start", e);
         }
         finally {
             workerGroup.shutdownGracefully();
@@ -108,7 +110,7 @@ public class MarsServer  implements CommandLineRunner {
 
         workerGroup.shutdownGracefully();
         bossGroup.shutdownGracefully();
-        logger.debug("ProxyServer  shutdown");
+        logger.debug("MarsServer  shutdown");
     }
 
     /**

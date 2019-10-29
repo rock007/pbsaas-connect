@@ -1,7 +1,7 @@
 package com.pbsaas.connect.server.mars.proxy;
 
+import com.pbsaas.connect.core.AppConstants;
 import com.pbsaas.connect.proto.PaintFriend;
-import com.pbsaas.connect.server.app.AppConstants;
 import com.pbsaas.connect.server.mars.connect.ConnInfo;
 import com.pbsaas.connect.server.mars.connect.MessageHolder;
 import com.pbsaas.connect.server.mars.connect.SendMsgQueue;
@@ -119,7 +119,6 @@ public class NetMsgHandler extends ChannelInboundHandlerAdapter {
                             .build();
 
                     response(ctx, AppConstants.MESSAGE_PUSH,0,response.toByteArray());
-
                 }
 
                 //更新时间

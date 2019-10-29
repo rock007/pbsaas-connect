@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package com.pbsaas.connect.proto;
+
+import "google/protobuf/any.proto";
+
+enum CmdID {
+
+    CMD_ID_UNKNOWN = 0;
+    CMD_ID_NOOPING = 6;
+    CMD_ID_PUSH = 10001;
+
+    CMD_ID_FRIEND = 1;
+    CMD_ID_GROUP = 2;
+    CMD_ID_MSG = 3;
+}
+
+enum ActID {
+
+    ACT_ID_UNKNOWN = 0;
+    ACT_ID_LOGIN = 1;
+    ACT_ID_LOGOUT = 2;
+
+    ACT_ID_SEND_MSG = 3;
+    ACT_ID_OFFLINE_MSGS = 4;
+
+    ACT_ID_NOTICE_RSP = 5;
+}
+
+enum MsgType {
+        MSG_TYPE_TEXT = 0;
+        MSG_TYPE_IMAGE = 1;
+        MSG_TYPE_SOUND = 2;
+        MSG_TYPE_VIDEO = 3;
+        MSG_TYPE_HTML = 4;
+        MSG_TYPE_LINK = 5;
+        MSG_TYPE_UNKNOWN = 6;
+}
+
+enum ChatType {
+      CHAT_TYPE_FRIEND = 0;
+      CHAT_TYPE_GROUP = 1;
+}
+
+message RespBody {
+
+     CmdID cmdid = 1;
+     
+     int32 result = 2;
+     string msg = 3;
+  
+  	 google.protobuf.Any data = 4;
+}
+
+
+message ReqBody {
+
+    CmdID cmdid = 1;
+	
+	string uid = 2;
+
+	string token = 3;
+	
+	google.protobuf.Any data = 4;
+
+}
+
+message MsgBody {
+
+    ChatType chatType =1 ;
+
+    string target = 2 ;
+
+    MsgType msgType = 3;
+
+	string text = 4;
+
+	string url = 5;
+
+	string from = 6 ;
+
+	string to = 7 ;
+
+    int32 time = 8 ;
+}
+
+message ChatMessageList {
+
+    repeated MsgBody messages = 1;
+
+}
+
+message Param{
+
+    string key =  1;
+    string value = 2;
+    string desc = 3;
+}
+
+message ParamList{
+
+    repeated Param params = 1;
+}
