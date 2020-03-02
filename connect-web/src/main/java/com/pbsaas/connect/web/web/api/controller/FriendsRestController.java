@@ -4,22 +4,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.pbsaas.connect.proto.PaintFriend;
+import com.pbsaas.connect.proto.Connect;
 import com.pbsaas.connect.web.web.model.JsonBody;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.util.StringUtils;
-
-import com.pbsaas.connect.db.entity.Account;
-import com.pbsaas.connect.db.entity.ChatFriend;
-import com.pbsaas.connect.db.entity.ChatFriendIds;
-import com.pbsaas.connect.db.entity.ChatGroup;
-import com.pbsaas.connect.db.entity.ChatGroupMember;
-import com.pbsaas.connect.db.entity.ChatGroupMemberIds;
-import com.pbsaas.connect.db.service.AccountService;
-import com.pbsaas.connect.db.service.FriendService;
 
 /**
  * @author sam
@@ -30,6 +21,7 @@ import com.pbsaas.connect.db.service.FriendService;
 @RequestMapping(value="/api")
 public class FriendsRestController  extends JsonBaseController{
 
+	/**
 	@Autowired
 	AccountService accountService;
 	
@@ -115,7 +107,7 @@ public class FriendsRestController  extends JsonBaseController{
 			m.setReq_status(0);
 			friendService.saveFriend(m);
 
-            PaintFriend.Param param=PaintFriend.Param.newBuilder()
+			Connect.Param param=Connect.Param.newBuilder()
                     .setKey("uid")
                     .setValue(userId).build();
             pushNotify("好友请求申请",to_user,param);
@@ -326,5 +318,5 @@ public class FriendsRestController  extends JsonBaseController{
 
         return  new JsonBody<Account>(1,"获取数据成功",acc);
     }
-
+****/
 }

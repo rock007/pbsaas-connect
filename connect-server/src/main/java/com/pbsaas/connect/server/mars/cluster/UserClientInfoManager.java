@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.pbsaas.connect.proto.Connect;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -189,10 +190,6 @@ public final class UserClientInfoManager implements InitializingBean {
 
     /**
      * 用户呼叫信息
-     * 
-     * @author 袁贵
-     * @version 1.0
-     * @since  1.0
      */
     public static class IMAVCall implements Serializable {
 
@@ -262,7 +259,8 @@ public final class UserClientInfoManager implements InitializingBean {
         }
 
         private List<Long> netConnects = new ArrayList<>();
-        private Set<IMBaseDefine.ClientType> clientTypes = new HashSet<>();
+
+        private Set<Connect.ClientType> clientTypes = new HashSet<>();
 
         public void addRouteConn(long netId) {
             this.netConnects.add(netId);
@@ -297,7 +295,7 @@ public final class UserClientInfoManager implements InitializingBean {
          * @param clientType 客户端类型
          * @since 1.0
          */
-        public void addClientType(IMBaseDefine.ClientType clientType) {
+        public void addClientType(Connect.ClientType clientType) {
             this.clientTypes.add(clientType);
         }
 
@@ -308,7 +306,7 @@ public final class UserClientInfoManager implements InitializingBean {
          * @return 客户端类型数
          * @since 1.0
          */
-        public int removeClient(IMBaseDefine.ClientType clientType, Long netId) {
+        public int removeClient(Connect.ClientType clientType, Long netId) {
             this.clientTypes.remove(clientType);
             this.netConnects.remove(netId);
             return clientTypes.size();
@@ -321,14 +319,17 @@ public final class UserClientInfoManager implements InitializingBean {
          * @return 用户是否在线
          * @since 1.0
          */
-        public UserStatType getStatus() {
-            IMBaseDefine.UserStatType status = IMBaseDefine.UserStatType.USER_STATUS_OFFLINE;
+        public Connect.StateType getStatus() {
+
+            Connect.StateType status = Connect.StateType.STATE_LEVEL;
+            /***!!
             for (IMBaseDefine.ClientType clientType : clientTypes) {
                 if (CommonUtils.isPc(clientType)) {
                     status = IMBaseDefine.UserStatType.USER_STATUS_ONLINE;
                     break;
                 }
             }
+            ****/
             return status;
         }
 
@@ -340,11 +341,14 @@ public final class UserClientInfoManager implements InitializingBean {
          */
         public boolean isPCClientLogin() {
 
-            for (IMBaseDefine.ClientType clientType : clientTypes) {
+            /***
+            for (Connect.ClientType clientType : clientTypes) {
                 if (CommonUtils.isPc(clientType)) {
                     return true;
                 }
             }
+            ***/
+
             return false;
         }
     }

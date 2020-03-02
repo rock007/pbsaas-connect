@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.pbsaas.connect.proto.Connect;
+import com.pbsaas.connect.server.mars.MarsConnectServer;
+import com.pbsaas.connect.server.mars.cluster.task.MessageToUserTask;
+import com.pbsaas.connect.server.mars.logic.ClientUser;
+import com.pbsaas.connect.server.mars.model.MsgHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -37,23 +42,24 @@ public class MessageServerCluster implements InitializingBean {
     private MyClusterMembershipListener membershipListener;
     @Autowired
     private UserClientInfoManager userClientInfoManager;
+
     @Autowired
     private MessageServerManager messageServerManager;
 
     private ITopic<MyClusterMessage> topic;
 
-    public void send(IMHeader header, MessageLite messageLite) {
+    public void send(MsgHeader header, MessageLite messageLite) {
         send(header, messageLite, false);
     }
 
-    public void send(IMHeader header, MessageLite messageLit, boolean retry) {
+    public void send(MsgHeader header, MessageLite messageLit, boolean retry) {
         // 根据类型处理
         MyClusterMessage clusterMessage = new MyClusterMessage(header, messageLit);
         this.topic.publish(clusterMessage);
     }
 
     @Async
-    public void sendToUser(long userId, long toNetId, IMHeader header, MessageLite messageLit) {
+    public void sendToUser(long userId, long toNetId, MsgHeader header, MessageLite messageLit) {
 
         String memberUuid = messageServerManager.getMemberByNetId(toNetId);
         Member member = toMember(memberUuid);
@@ -67,9 +73,9 @@ public class MessageServerCluster implements InitializingBean {
     }
 
     @Async
-    public void sendToUser(long userId, IMHeader header, MessageLite messageLit) {
+    public void sendToUser(long userId, MsgHeader header, MessageLite messageLit) {
 
-        UserClientInfo clientInfo = userClientInfoManager.getUserInfo(userId);
+        UserClientInfoManager.UserClientInfo clientInfo = userClientInfoManager.getUserInfo(userId);
 
         if (clientInfo != null) {
             Set<String> uuids = messageServerManager.getMemberByNetIds(clientInfo.getRouteConns());
@@ -93,19 +99,13 @@ public class MessageServerCluster implements InitializingBean {
 
     /**
      * 更新用户状态
-     * 
-     * @param userId 用户ID
-     * @param clientType 客户端类型
-     * @param msgCtx 用户与消息服务器的Netty连接
-     * @param status 状态
-     * @return
-     * @since 1.0
      */
     @Async
     public ListenableFuture<?> userStatusUpdate(Long userId, ChannelHandlerContext msgCtx,
-            UserStatType status) {
+                                                Connect.StateType status) {
 
-        ClientType clientType = msgCtx.attr(ClientUser.CLIENT_TYPE).get();
+        /***
+        Connect.ClientType clientType = msgCtx.attr(ClientUser.CLIENT_TYPE).get();
         long handleId = msgCtx.attr(ClientUser.HANDLE_ID).get();
         String nodeId = hazelcastInstance.getCluster().getLocalMember().getUuid();
         
@@ -203,7 +203,8 @@ public class MessageServerCluster implements InitializingBean {
         } finally {
             lock.unlock();
         }
-
+***/
+        String nodeId="";
         AsyncResult<?> result = new AsyncResult<>(nodeId);
 
         return result;
@@ -214,7 +215,7 @@ public class MessageServerCluster implements InitializingBean {
      * 限制多设备同时连接
      */
     @Async
-    public ListenableFuture<List<IMBaseDefine.UserStat>> kickOutSameClientType(Long userId,
+    public ListenableFuture<List<Connect.StateType>> kickOutSameClientType(Long userId,
             Integer reasonType) {
         // 更新用户在线状态
         // FIXME
@@ -225,16 +226,17 @@ public class MessageServerCluster implements InitializingBean {
      * 查询用户在线状态
      */
     @Async
-    public ListenableFuture<List<IMBaseDefine.UserStat>> userStatusReq(Long fromUserId,
+    public ListenableFuture<List<Connect.StateType>> userStatusReq(Long fromUserId,
             List<Long> userIdList) {
 
         logger.debug("查询用户在线状态, user_cnt={}", userIdList.size());
 
-        List<IMBaseDefine.UserStat> userStatList = new ArrayList<>();
+        List<Connect.StateType> userStatList = new ArrayList<>();
         for (Long userId : userIdList) {
 
             UserClientInfoManager.UserClientInfo userClientInfo =
                     userClientInfoManager.getUserInfo(userId);
+            /***!!
             IMBaseDefine.UserStat.Builder userStatBuiler = IMBaseDefine.UserStat.newBuilder();
             userStatBuiler.setUserId(userId);
             if (userClientInfo != null) {
@@ -244,9 +246,10 @@ public class MessageServerCluster implements InitializingBean {
             }
 
             userStatList.add(userStatBuiler.build());
+            ****/
         }
 
-        AsyncResult<List<IMBaseDefine.UserStat>> result = new AsyncResult<>(userStatList);
+        AsyncResult<List<Connect.StateType>> result = new AsyncResult<>(userStatList);
         return result;
     }
 
@@ -254,12 +257,14 @@ public class MessageServerCluster implements InitializingBean {
      * 查询用户在线状态
      */
     @Async
-    public ListenableFuture<IMBaseDefine.UserStat> userStatusReq(Long userId) {
+    public ListenableFuture<Connect.StateType> userStatusReq(Long userId) {
 
         logger.debug("查询用户在线状态, user_id={}", userId);
 
         UserClientInfoManager.UserClientInfo userClientInfo =
                 userClientInfoManager.getUserInfo(userId);
+
+        /**
         IMBaseDefine.UserStat.Builder userStatBuiler = IMBaseDefine.UserStat.newBuilder();
         userStatBuiler.setUserId(userId);
         if (userClientInfo != null) {
@@ -267,30 +272,32 @@ public class MessageServerCluster implements InitializingBean {
         } else {
             userStatBuiler.setStatus(IMBaseDefine.UserStatType.USER_STATUS_OFFLINE);
         }
+         ****/
 
-        AsyncResult<IMBaseDefine.UserStat> result = new AsyncResult<>(userStatBuiler.build());
+        AsyncResult<Connect.StateType> result = null;//!!new AsyncResult<>(userStatBuiler.build());
         return result;
     }
 
     @Async
-    public void registLocal(MessageServerStarter messageServerStarter) {
+    public void registLocal(MarsConnectServer server) {
 
         logger.info("更新消息服务器信息");
-
         MessageServerManager.MessageServerInfo serverInfo =
                 new MessageServerManager.MessageServerInfo();
-        serverInfo.setPriorIP(messageServerStarter.getPriorIP());
-        serverInfo.setIp(messageServerStarter.getIpadress());
-        serverInfo.setPort(messageServerStarter.getPort());
+        serverInfo.setPriorIP(server.getPriorIP());
+        serverInfo.setIp(server.getIpadress());
+        serverInfo.setPort(server.getPort());
+
         messageServerManager.insert(serverInfo);
     }
 
     @Async
     public ListenableFuture<?> webrtcInitateCallReq(long fromId, long toId, long netId) {
 
-        // FIXME
+
         // 从当前的通话中查看是否已存在
         // 如果存在，判断类型，返回给呼叫发起方
+        /**
         IMAVCall avCall = userClientInfoManager.getCaller(fromId);
 
         // 如果不存在，则处理呼叫
@@ -302,18 +309,17 @@ public class MessageServerCluster implements InitializingBean {
             }
             userClientInfoManager.addCaller(fromId, netId);
         } else {
-            // TODO Self Busy
 
             return AsyncResult.forExecutionException(new Exception());
         }
-
+        ****/
         return AsyncResult.forValue("");
     }
 
     @Async
     public ListenableFuture<?> webrtcInitateCallRes(long fromId, long toId, long netId) {
 
-        // FIXME
+        /**
         // 从当前的通话中查看是否已存在
         IMAVCall toAvCall = userClientInfoManager.getCalled(toId);
         if (toAvCall != null) {
@@ -321,7 +327,7 @@ public class MessageServerCluster implements InitializingBean {
             // TODO 其他端，已经接受了 IMAVCallCancelReq
             return AsyncResult.forExecutionException(new Exception());
         }
-        
+        ***/
         // 如果不存在，则处理呼叫
         userClientInfoManager.addCalled(toId, netId);
         return AsyncResult.forValue("");
@@ -329,7 +335,7 @@ public class MessageServerCluster implements InitializingBean {
 
     @Async
     public void webrtcHungupReq(long fromId, long toId, long callId) {
-
+        /***
         // 从当前的通话中查看是否已存在
         IMAVCall avCall = userClientInfoManager.getCaller(fromId);
         Long toNetId;
@@ -355,6 +361,8 @@ public class MessageServerCluster implements InitializingBean {
 
         // 把挂断的消息，广播给对方
         sendToUser(toId, toNetId, hdCancel, callCancelReq);
+
+         ***/
     }
 
     private Member toMember(String uuid) {
@@ -383,10 +391,12 @@ public class MessageServerCluster implements InitializingBean {
         return null;
     }
     
+    /**!!包装用户状态proc
     private IMBaseDefine.UserStat userStat(long userId, UserStatType status) {
         IMBaseDefine.UserStat.Builder userStatBuiler = IMBaseDefine.UserStat.newBuilder();
         userStatBuiler.setUserId(userId);
         userStatBuiler.setStatus(status);
         return userStatBuiler.build();
     }
+    ***/
 }

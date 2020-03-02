@@ -34,8 +34,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.pbsaas.connect.db.entity.cms.UploadFile;
-import com.pbsaas.connect.db.service.UploadFileService;
 import com.pbsaas.connect.web.utils.StringHelper;
 
 /**
@@ -59,8 +57,8 @@ public class FileUploadController extends JsonBaseController {
 	private ResourceLoader resourceLoader;
 	
 	
-	@Autowired
-	UploadFileService uploadFileService;
+	//@Autowired
+	//UploadFileService uploadFileService;
 	
 	/**
 	 * 文件上传(user_id 可为空)
@@ -76,10 +74,10 @@ public class FileUploadController extends JsonBaseController {
 	            @RequestParam(value="upload_file",required=true) MultipartFile file,
 	            @RequestParam(value="user_id",required=false,defaultValue="") String user_id,HttpServletRequest request){
 		 
-		    JsonBody<Map<String, Object>> JsonBody;
+		    JsonBody<Map<String, Object>> JsonBody=null;
 		    
  			Map<String, Object>  resultMap=new HashMap<String,Object>();
-        	
+        	/****
 	        UploadFile oneFile= saveUploadFile(file,user_id, request);
 	        	
 	        if(oneFile!=null){
@@ -93,10 +91,10 @@ public class FileUploadController extends JsonBaseController {
 	    		
 	    		JsonBody=new JsonBody<>(-1,"文件上传失败",resultMap);
 	        }
-	        				
+	        	****/
 			return JsonBody;
 	    }
-
+/***
 	private UploadFile saveUploadFile( MultipartFile file,String userId,
 			HttpServletRequest request) {
 		
@@ -146,7 +144,7 @@ public class FileUploadController extends JsonBaseController {
 		
 		return oneFile;
 	}
-	
+	****/
 	 
 	 	@RequestMapping(value="/download-file-{pid}.action",method = RequestMethod.GET)
 		public  ResponseEntity<byte[]> getProductImage(@PathVariable String pid,
@@ -158,7 +156,7 @@ public class FileUploadController extends JsonBaseController {
 			
 		    String root =uploadRootDir;// request.getServletContext().getRealPath("/");
 		    String fullPath="",subPath="";
-		    
+		    /***
 		    UploadFile uploadFile=uploadFileService.findById(pid);
 		    
 		    if(uploadFile!=null){
@@ -189,7 +187,7 @@ public class FileUploadController extends JsonBaseController {
 		    		
 		    	}
 		    }
-		    
+		    ***/
 		    if(fullPath.equals("")){
 		    	
 		    	return new ResponseEntity<byte[]>(new byte[]{},  

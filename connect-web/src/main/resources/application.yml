@@ -9,7 +9,7 @@ server:
 
 spring:
   application:
-    name: web
+    name: connect-web
     index: 1
     mvc:
       favicon:
@@ -58,7 +58,7 @@ security:
   oauth2:
     filter-order: 3
     client:
-      client-id: vole
+      client-id: xxx
       client-secret: 123456
   resource:
     jwt:
@@ -94,3 +94,15 @@ authentication:
     clientid: pf_app
     secret: secret
     tokenValidityInSeconds: 2592000
+
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:20000/eureka
+  instance:
+    hostname: connect-web
+    instanceId: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}
+    preferIpAddress: true

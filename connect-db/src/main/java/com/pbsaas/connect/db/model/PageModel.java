@@ -56,7 +56,7 @@ public class PageModel<T extends Serializable> implements Serializable {
             if (null != resultList) {
                 List<V> rsList = new ArrayList<V>();
                 for (T po : resultList) {
-                    V vo = clazz.newInstance();
+                    V vo = clazz.getDeclaredConstructor().newInstance();
                     BeanUtils.copyProperties(po, vo);
                     rsList.add(vo);
                 }

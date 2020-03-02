@@ -5,25 +5,30 @@ import java.io.Serializable;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.MessageLite;
+import com.pbsaas.connect.server.mars.connect.ProtobufParseMap;
+import com.pbsaas.connect.server.mars.model.MsgHeader;
 
 /**
  * 用于转发的消息
  */
-public class MyClusterMessage extends IMHeader implements Serializable {
+public class MyClusterMessage extends MsgHeader implements Serializable {
 
     public MyClusterMessage() {
 
     }
     
-    public MyClusterMessage(IMHeader header, MessageLite message) {
+    public MyClusterMessage(MsgHeader header, MessageLite message) {
         this.setLength(header.getLength());
+        /**!!!
         this.setServiceId(header.getServiceId());
         this.setCommandId(header.getCommandId());
         this.setFlag(header.getFlag());
         this.setSeqnum(header.getSeqnum());
         this.setVersion(header.getVersion());
         this.setReserved(header.getReserved());
+
         this.body = message.toByteString();
+         ***/
     }
     
     /**
@@ -31,37 +36,34 @@ public class MyClusterMessage extends IMHeader implements Serializable {
      */
     private static final long serialVersionUID = -4338840768343533177L;
     
-    private ByteString body;
+    //!!private ByteString body;
 
-    /**
-     * @return the body
-     */
-    public ByteString getBody() {
-        return body;
-    }
+    //public ByteString getBody() {
+    //    return body;
+    //}
 
-    /**
-     * @param body the body to set
-     */
-    public void setBody(ByteString body) {
-        this.body = body;
-    }
+    //public void setBody(ByteString body) {
+    //    this.body = body;
+    //}
 
-    public IMHeader getHeader() {
-        IMHeader header = new IMHeader();
+    public MsgHeader getHeader() {
+
+        MsgHeader header = new MsgHeader();
         header.setLength(this.getLength());
+        /**
         header.setServiceId(this.getServiceId());
         header.setCommandId(this.getCommandId());
         header.setFlag(this.getFlag());
         header.setSeqnum(this.getSeqnum());
         header.setVersion(this.getVersion());
         header.setReserved(this.getReserved());
+        ***/
         return header;
     }
 
     public MessageLite getMessage() throws IOException {
-        byte[] content = body.toByteArray();
-        MessageLite msg = ProtobufParseMap.getMessage(this.getServiceId(), this.getCommandId(), content);
+        byte[] content = this.getBody();//!!body.toByteArray();
+        MessageLite msg = ProtobufParseMap.getMessage(this.getCmdId(), this.getActId(), content);
         return msg;
     }
 }

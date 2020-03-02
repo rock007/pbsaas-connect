@@ -1,7 +1,3 @@
-/*
- * Copyright © 2013-2017 BLT, Co., Ltd. All Rights Reserved.
- */
-
 package com.pbsaas.connect.server.mars.cluster;
 
 import java.io.Serializable;

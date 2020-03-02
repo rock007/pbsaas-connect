@@ -15,6 +15,22 @@ enum CmdID {
     CMD_ID_MSG = 3;
 }
 
+enum ClientType{
+
+    CLIENTTYPE_WINDOWS=0;
+    CLIENTTYPE_MAC=1;
+    CLIENTTYPE_ANDROID=2;
+    CLIENTTYPE_IOS=3;
+    CLIENTTYPE_WEB=4;
+}
+
+enum StateType{
+    STATE_UNKNOW=0;
+    STATE_ONLINE=1;
+    STATE_OFFLINE=2;
+    STATE_LEVEL=3;
+}
+
 enum ActID {
 
     ACT_ID_UNKNOWN = 0;

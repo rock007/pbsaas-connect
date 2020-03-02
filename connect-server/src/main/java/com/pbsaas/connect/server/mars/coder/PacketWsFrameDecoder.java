@@ -7,7 +7,9 @@ package com.pbsaas.connect.server.mars.coder;
 import java.util.List;
 
 import com.pbsaas.connect.proto.Connect;
+import com.pbsaas.connect.server.mars.connect.ProtobufParseMap;
 import com.pbsaas.connect.server.mars.model.MsgHeader;
+import com.pbsaas.connect.server.mars.model.ProtoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,8 +51,8 @@ public class PacketWsFrameDecoder extends MessageToMessageDecoder<WebSocketFrame
                 logger.error("message length less than 0, channel closed");
                 return;
             }
-/**
-            ByteBuf byteBuf = ctx.alloc().buffer(header.getLength());
+
+            ByteBuf byteBuf = ctx.alloc().buffer(header.getLength() - MsgHeader.FIXED_HEADER_SKIP);
 
             in.readBytes(byteBuf);
             byte[] body;
@@ -61,11 +63,11 @@ public class PacketWsFrameDecoder extends MessageToMessageDecoder<WebSocketFrame
                 byteBuf.readBytes(body);
             }
 
-            MessageLite content = ProtobufParseMap.getMessage(header.getServiceId(), header.getCommandId(), body);
+            MessageLite content = ProtobufParseMap.getMessage(header.getCmdId(), header.getActId(), body);
 
-            IMProtoMessage<MessageLite> protoMessage = new IMProtoMessage<>(header, content);
+            ProtoMessage<MessageLite> protoMessage = new ProtoMessage<>(header, content);
             out.add(protoMessage);
-**/
+
             final Connect.ReqBody request = Connect.ReqBody.parseFrom(header.getBody());
 
             out.add(request);

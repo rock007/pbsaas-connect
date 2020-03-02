@@ -62,13 +62,15 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
         return  delegatingPasswordEncoder;
     }
 
-    @Autowired
-    private DataSource dataSource;
-    
+    //@Autowired
+    //private DataSource dataSource;
+
+    /**
     @Bean
     public TokenStore tokenStore() {
         return new JdbcTokenStore(dataSource);
     }
+    **/
 
 	 @Autowired
 	 public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {

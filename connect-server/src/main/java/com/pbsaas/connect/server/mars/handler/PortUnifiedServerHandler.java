@@ -6,6 +6,7 @@ import com.pbsaas.connect.server.mars.coder.PacketDecoder;
 import com.pbsaas.connect.server.mars.coder.PacketEncoder;
 import com.pbsaas.connect.server.mars.coder.PacketWsFrameDecoder;
 import com.pbsaas.connect.server.mars.coder.PacketWsFrameEncoder;
+import com.pbsaas.connect.server.mars.logic.LogicManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,8 @@ public class PortUnifiedServerHandler extends ByteToMessageDecoder {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private LogicManager logicManager;
+
     public PortUnifiedServerHandler(SslContext sslCtx) {
         this(sslCtx, true, true);
     }
@@ -43,6 +46,10 @@ public class PortUnifiedServerHandler extends ByteToMessageDecoder {
         this.sslCtx = sslCtx;
         this.detectSsl = detectSsl;
         this.detectGzip = detectGzip;
+    }
+
+    public void setLogicManager(LogicManager logicManager) {
+        this.logicManager = logicManager;
     }
 
     @Override
@@ -151,7 +158,7 @@ public class PortUnifiedServerHandler extends ByteToMessageDecoder {
         pipeline.addLast("decoder", new PacketDecoder());
         pipeline.addLast("encoder", new PacketEncoder());
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
-        pipeline.addLast("handler", new MessageServerHandler());
+        pipeline.addLast("handler", new MessageServerHandler(logicManager));
         pipeline.remove(this);
     }
 }

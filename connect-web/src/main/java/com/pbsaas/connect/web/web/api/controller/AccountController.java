@@ -10,11 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.pbsaas.connect.core.AppConstants;
-import com.pbsaas.connect.db.entity.Account;
-import com.pbsaas.connect.db.entity.Message;
-import com.pbsaas.connect.db.entity.Role;
-import com.pbsaas.connect.db.entity.SysDict;
-import com.pbsaas.connect.db.type.RoleType;
+
 import com.pbsaas.connect.web.web.model.JsonBody;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -34,9 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.util.StringUtils;
 
-import com.pbsaas.connect.db.service.MessageService;
-import com.pbsaas.connect.db.service.SysDictService;
-
 import com.pbsaas.connect.web.utils.StringHelper;
 
 /**
@@ -48,24 +41,20 @@ import com.pbsaas.connect.web.utils.StringHelper;
 @RequestMapping(value="/api")
 public class AccountController extends JsonBaseController{
 
-	@Autowired
-	private RestTemplate restTemplate;
-	
-	@Autowired
-	private MessageService messageService;
-	
-	@Autowired
-	private SysDictService sysDictService;
+	//@Autowired
+	//private RestTemplate restTemplate;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	/**
 	 private Account findAccount(String uid){
 
 			Account curUser= accountService.findById(uid);
 
 			return curUser;
 		}
+		****/
 
 		@ApiOperation(value="用户注册", notes="新用户注册")
 		@RequestMapping(value="/register.json",method = RequestMethod.POST)
@@ -75,6 +64,7 @@ public class AccountController extends JsonBaseController{
 			
 			Map<String, String>  resultMap=new HashMap<String,String>();
 			//!!!!
+			/**
 			Account m=new Account();
 			if( StringUtils.isEmptyOrWhitespace(m.getMobile())){
 				
@@ -116,7 +106,7 @@ public class AccountController extends JsonBaseController{
 			 
 			resultMap.put("user_id", m.getId());
 			resultMap.put("user_name", m.getName());
-			
+			****/
 			return new JsonBody<>(1,"注册用户成功",resultMap);
 		}
 		
@@ -157,7 +147,7 @@ public class AccountController extends JsonBaseController{
 				
 				return new JsonBody<>(-1,"密码不能为空");
 			}
-
+	/**
 			Account existOne=new Account();
 			
 			if(StringHelper.isMobileNO(user_name)){
@@ -169,16 +159,7 @@ public class AccountController extends JsonBaseController{
 
 				existOne= accountService.findByName(user_name);	
 			}
-			
-			/***
-			Set<Role> a=existOne.getRoles();
-			String role="";
-			for (Role str : a) {  
-				role=str.getId().toString();
-				break;
-			}  
-			***/
-			//modify roles by sam@20170512 
+
 			 String roleStr="";
 			 
 			if(existOne!=null&&passwordEncoder.matches(pwd, existOne.getPwd())){
@@ -212,7 +193,8 @@ public class AccountController extends JsonBaseController{
 				
 				return new JsonBody<>(-1,"登录失败，用户名密码不正确");	
 			}
-			
+			****/
+			return  null;
 		}
 
 
@@ -221,6 +203,7 @@ public class AccountController extends JsonBaseController{
 				String openid, String token, String nickname, String from) {
 
 			// user是否已经登录
+			/***
 			Account oneUser = null;
 
 			if (StringUtils.isEmptyOrWhitespace(user_id)) {
@@ -255,7 +238,7 @@ public class AccountController extends JsonBaseController{
 				
 				return new JsonBody<String>(-2, "参数错误，非本用户不能操作！");
 			}
-
+	***/
 			return new JsonBody<String>(1, "第三方账号解除绑定成功！");
 			
 		}
@@ -265,7 +248,7 @@ public class AccountController extends JsonBaseController{
 				String user_id,String openid,String token ,String nickname,String from,String headimgurl){
 
 			Map<String,Object> userInfo=new HashMap<String,Object>();
-			
+			/****
 			//user是否已经登录
 			Account oneUser=null;
 			
@@ -363,16 +346,7 @@ public class AccountController extends JsonBaseController{
 			userInfo.put("wx_open_id", oneUser.getWxOpenid());
 			userInfo.put("wx_token", oneUser.getWx_token());
 			userInfo.put("from", from);
-			
-			//20170222 add 
-			/***
-			Set<Role> a=oneUser.getRoles();
-			String role="";
-			for (Role str : a) {  
-				role=str.getId().toString();
-				break;
-			} 
-			**/
+
 			//modify roles by sam@20170512 
 			 String roleStr="";
 			 for(Role r:oneUser.getRoles()){
@@ -385,10 +359,11 @@ public class AccountController extends JsonBaseController{
 			userInfo.put("roles", roleStr);
 			//userInfo.put("houses", houses);
 			//userInfo.put("shops", shops);
-			
+			****/
 			return new JsonBody<>(1,"用户第三方账号登录成功！",userInfo);
 		}
-		
+
+		/***
 		private Account setThirdLink(String from,Account oneUser,String openid,String token,String nickname){
 			
 			if(from.equals("qq")){
@@ -409,10 +384,11 @@ public class AccountController extends JsonBaseController{
 			
 			return oneUser;
 		}
-
+***/
 		@RequestMapping(value="/find-pwd.json",method = RequestMethod.POST)
 		public @ResponseBody  JsonBody<String> find_pwd(String user_mobile) throws Exception {
-			
+
+			/***
 			if( StringUtils.isEmptyOrWhitespace(user_mobile)){
 				
 				return new JsonBody<>(-1,"user_mobile 不能为空");
@@ -430,13 +406,14 @@ public class AccountController extends JsonBaseController{
 			logger.debug("find_pwd resp:",resp);
 			user.setPwd(passwordEncoder.encode(user_pwd_new));
 		 	accountService.save(user);
-
+****/
 			return new JsonBody<String>(1,"操作成功，新密码已经发送，请登录后修改密码");
 		}
 		
 		@RequestMapping(value = "/change-pwd.json",method = RequestMethod.POST)
 		public @ResponseBody  JsonBody<String> change_pwd(String user_id,String user_pwd,String user_pwd_new) {
-			
+
+
 			if( StringUtils.isEmptyOrWhitespace(user_id)){
 				
 				return new JsonBody<>(-1,"user_id不能为空");
@@ -449,6 +426,7 @@ public class AccountController extends JsonBaseController{
 				
 				return new JsonBody<>(-1,"user_pwd_new不能为空");
 			}
+			/***
 		 	Account curUser= findAccount(user_id);
 			
 		 	if(curUser==null){
@@ -461,6 +439,7 @@ public class AccountController extends JsonBaseController{
 		 	
 		 	curUser.setPwd(passwordEncoder.encode(user_pwd_new));
 		 	accountService.save(curUser);
+			 ****/
 			return new JsonBody<String>(1,"操作成功，下次登录请用新密码");
 		}
 	
@@ -491,7 +470,7 @@ public class AccountController extends JsonBaseController{
 
 				return new JsonBody<>(-1, "nickname不能为空");
 			}
-
+/***
 			Account oneAccount = findAccount(user_id);
 
 			if (oneAccount == null) {
@@ -514,33 +493,11 @@ public class AccountController extends JsonBaseController{
 			oneAccount.setNickname(nickname);
 			
 			accountService.save(oneAccount);
-
+*****/
 			return new JsonBody<>(1, "更新用户信息成功");
 		}
 		
-		@RequestMapping(value="/get-my-msg.json",method = RequestMethod.GET)
-		public @ResponseBody JsonBody<Page<Message>> get_my_msg(String user_id,
-                                                                @ModelAttribute Message m
-				, @RequestParam(value="page",required=false,defaultValue="0")  int pageIndex
-				, @RequestParam(value="pageSize",required=false,defaultValue="10")  int pageSize){
-			
-			if(StringUtils.isEmpty(user_id) ){
-				
-				return new JsonBody<>(-1,"user_id 不能为空");
-			}
-			
-			Account curUser=this.findAccount(user_id);
-			
-			if(curUser==null){
-				
-				return new JsonBody<>(-2,"参数错误，用户不存在");
-			}
-			
-			m.setSend_to(user_id);
-			Page<Message> page= messageService.search(m, pageIndex, pageSize);
-			
-			return new JsonBody<>(1,"获取数据成功",page);
-		}
+
 		
 		/***
 		 * 字典表查询
@@ -549,7 +506,7 @@ public class AccountController extends JsonBaseController{
 		 * @return
 		 */
 		@RequestMapping(value="/get-dict-by.json",method = RequestMethod.GET)
-		public @ResponseBody JsonBody<List<SysDict>> get_dict_by(String user_id,
+		public @ResponseBody JsonBody<List<Object>> get_dict_by(String user_id,
                                                                  Long mtype){
 			
 			if(StringUtils.isEmpty(user_id) ){
@@ -560,7 +517,7 @@ public class AccountController extends JsonBaseController{
 			if(mtype==null){
 				return new JsonBody<>(-1,"mtype 不能为空");
 			}
-			
+			/***
 			Account curUser=this.findAccount(user_id);
 			
 			if(curUser==null){
@@ -569,8 +526,8 @@ public class AccountController extends JsonBaseController{
 			}
 			
 			List<SysDict> list= sysDictService.findByMtype(mtype);
-			
-			return new JsonBody<>(1,"获取数据成功",list);
+			***/
+			return new JsonBody<>(1,"获取数据成功",null);//,list
 		}
 		
 		@RequestMapping(value="/read-msg.json",method = RequestMethod.GET)
@@ -580,7 +537,7 @@ public class AccountController extends JsonBaseController{
 				
 				return new JsonBody<>(-1,"user_id 不能为空");
 			}
-			
+			/***
 			Account curUser=this.findAccount(user_id);
 			
 			if(curUser==null){
@@ -595,7 +552,7 @@ public class AccountController extends JsonBaseController{
 				msg.setStatus(1);
 				messageService.save(msg);
 			}
-			
+			****/
 			return new JsonBody<>(1,"更新数据成功");
 		}
 
@@ -607,15 +564,18 @@ public class AccountController extends JsonBaseController{
      * @return
      */
     @PostMapping("/search-friends.json")
-    public @ResponseBody  JsonBody<Page<Account>> search_friends(String  key
+    public @ResponseBody  JsonBody<Page<Object>> search_friends(String  key
             , @RequestParam(value="page",required=false,defaultValue="0")  int pageIndex
             , @RequestParam(value="pageSize",required=false,defaultValue="10")  int pageSize) {
-
+/***
         Account m=new Account();
         m.setName(key);
         Page<Account> page= accountService.search(m, pageIndex, pageSize);
 
         return new JsonBody<Page<Account>>(1,"获取数据成功",page);
+ ***/
+return  null;
+
     }
 
 
@@ -634,7 +594,7 @@ public class AccountController extends JsonBaseController{
 
 		    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 
-		    ResponseEntity<String> response = restTemplate.postForEntity( url, request , String.class );
+		    ResponseEntity<String> response =null;// restTemplate.postForEntity( url, request , String.class );
 		    
 		    return response.getBody();
 		}

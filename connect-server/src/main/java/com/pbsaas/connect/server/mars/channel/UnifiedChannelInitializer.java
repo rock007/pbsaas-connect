@@ -4,6 +4,7 @@
 package com.pbsaas.connect.server.mars.channel;
 
 import com.pbsaas.connect.server.mars.handler.PortUnifiedServerHandler;
+import com.pbsaas.connect.server.mars.logic.LogicManager;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -21,6 +22,9 @@ public class UnifiedChannelInitializer extends ChannelInitializer<SocketChannel>
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final SslContext sslCtx;
 
+    @Autowired
+    private LogicManager logicManager;
+
     public UnifiedChannelInitializer() {
 
         // Configure SSL context
@@ -35,8 +39,7 @@ public class UnifiedChannelInitializer extends ChannelInitializer<SocketChannel>
         pipeline.addLast(new LoggingHandler(LogLevel.DEBUG));
         PortUnifiedServerHandler portUnificationServerHandler = new PortUnifiedServerHandler(sslCtx);
 
-        //portUnificationServerHandler.setHandlerManager(handlerManager);
-
+        portUnificationServerHandler.setLogicManager(logicManager);
         pipeline.addLast(portUnificationServerHandler);
     }
 

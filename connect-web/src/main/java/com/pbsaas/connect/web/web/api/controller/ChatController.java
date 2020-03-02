@@ -5,12 +5,10 @@ import java.util.Map;
 
 import com.google.protobuf.Any;
 
-import com.pbsaas.connect.proto.PaintFriend;
+import com.pbsaas.connect.proto.Connect;
 import com.pbsaas.connect.web.web.model.JsonBody;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import com.pbsaas.connect.db.entity.ChatMessage;
 
 
 /**
@@ -34,11 +32,11 @@ public class ChatController   extends JsonBaseController {
 	
 	@PostMapping(value="/send-msg.json")
 	public @ResponseBody
-    JsonBody<ChatMessage> send_msg(String chatType, String to, Integer msgType, String msg, String uid) {
-
-        PaintFriend.MsgBody  msgBody= PaintFriend.MsgBody.newBuilder()
-                .setChatType(chatType.equals("group")? PaintFriend.ChatType.CHAT_TYPE_GROUP_VALUE: PaintFriend.ChatType.CHAT_TYPE_FRIEND_VALUE)
-                .setMsgType(msgType)
+    JsonBody<Object> send_msg(String chatType, String to, Integer msgType, String msg, String uid) {
+/**!!
+		Connect.MsgBody  msgBody= Connect.MsgBody.newBuilder()
+                .setChatType(chatType.equals("group")? Connect.ChatType.CHAT_TYPE_GROUP: Connect.ChatType.CHAT_TYPE_FRIEND)
+                //!!.setMsgType(msgType)
                 .setText(msg)
                 .setUrl("")
                 .setFrom(uid)
@@ -46,14 +44,14 @@ public class ChatController   extends JsonBaseController {
                 .setTime(Long.valueOf(new Date().getTime()).intValue())
                 .build();
 
-        PaintFriend.ReqBody     req = PaintFriend.ReqBody.newBuilder()
-                .setActid(PaintFriend.ActID.ACT_ID_SEND_MSG_VALUE)
-                .setText("send-msg-action")
+		Connect.ReqBody     req = Connect.ReqBody.newBuilder()
+                .setCmdid(Connect.CmdID.CMD_ID_MSG)
+                //.setText("send-msg-action")
                 .setToken("")
                 .setUid(uid)
                 .setData(Any.pack(msgBody))
                 .build();
-/**!!
+
         if(!SendMsgQueue.getQueue().offer(req)){
 
             return new JsonBody<>(1,"发送失败",null);

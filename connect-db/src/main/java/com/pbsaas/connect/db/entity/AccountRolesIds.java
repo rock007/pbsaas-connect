@@ -71,12 +71,4 @@ public class AccountRolesIds  implements Serializable{
 		return super.toString();
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-	
-		super.finalize();
-	}
-	
-	
-	
 }

@@ -1,12 +1,12 @@
 package com.pbsaas.connect.web.app.config;
 
-import com.pbsaas.connect.db.type.RoleType;
 import com.pbsaas.connect.web.app.config.security.CustomLogoutSuccessHandler;
 import com.pbsaas.connect.web.app.config.security.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +20,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -84,14 +86,26 @@ public class OAuth2Configuration {
         @Autowired
     	private UserApprovalHandler userApprovalHandler;
         
-    	@Autowired
-    	private TokenStore tokenStore;
-        
+    	//@Autowired
+    	//private TokenStore tokenStore;
+
+        @Bean
+        public TokenStore jwtTokenStore() {
+            return new JwtTokenStore(jwtAccessTokenConverter());
+        }
+
+        @Bean
+        public JwtAccessTokenConverter jwtAccessTokenConverter() {
+            JwtAccessTokenConverter accessTokenConverter = new JwtAccessTokenConverter();
+            accessTokenConverter.setSigningKey("test_key"); // 签名密钥
+            return accessTokenConverter;
+        }
+
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints)
                 throws Exception {
             endpoints
-                    .tokenStore(tokenStore)
+                   .tokenStore(jwtTokenStore())
                     .userApprovalHandler(userApprovalHandler)
                     .authenticationManager(authenticationManager);
         }
@@ -103,7 +117,7 @@ public class OAuth2Configuration {
                     .inMemory()
                     .withClient(PROP_CLIENTID)
                     .scopes("read", "write","trust")
-                    .authorities(RoleType.admin.name(), RoleType.normal.name())
+                    .authorities("admin", "normal")
                     .authorizedGrantTypes("password", "refresh_token")
                     .secret(PROP_SECRET)
                     .accessTokenValiditySeconds(1800);

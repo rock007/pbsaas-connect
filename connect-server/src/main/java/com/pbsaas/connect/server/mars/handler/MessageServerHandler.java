@@ -62,20 +62,25 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
         // 处理请求分发
         switch(header.getCmdId()) {
 
+            case Connect.CmdID.CMD_ID_UNKNOWN_VALUE:
+                logicManager.doLogin(ctx, header.getActId(), header, message.getBody());
+                break;
             case Connect.CmdID.CMD_ID_FRIEND_VALUE:
                 //好友
 
                 break;
             case Connect.CmdID.CMD_ID_GROUP_VALUE:
                 //群组
+                logicManager.doGroup(ctx, header.getActId(), header, message.getBody());
                 break;
             case Connect.CmdID.CMD_ID_MSG_VALUE:
                 //消息
+                logicManager.doMessage(ctx, header.getActId(), header, message.getBody());
                 break;
             case Connect.CmdID.CMD_ID_NOOPING_VALUE:
                 //心跳
                 break;
-
+/**
             case IMBaseDefine.ServiceID.SID_LOGIN_VALUE:
                 handlerManager.doLogin(ctx, header.getCommandId(), header, message.getBody());
                 break;
@@ -100,17 +105,13 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
             case IMBaseDefine.ServiceID.SID_AVCALL_VALUE: // for webrtc
                 handlerManager.doWebrtc(ctx, header.getCommandId(), header, message.getBody());
                 break;
+            ***/
             default:
                 logger.warn("暂不支持的服务ID{}" , header.getServiceId());
                 break;
         }
     
     }
-
-//    @Override
-//    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-//        
-//    }
 
     /**
      * 服务端监听到客户端活动
@@ -123,7 +124,7 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
         // 服务端接收到客户端上线通知
         Channel incoming = ctx.channel();
         logger.debug("MessageServerHandler:" + incoming.remoteAddress() + "在线");
-        handlerManager.online(ctx);
+        logicManager.online(ctx);
         ctx.fireChannelActive();
     }
 
@@ -138,7 +139,7 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
         // 服务端接收到客户端掉线通知
         Channel incoming = ctx.channel();
         logger.debug("MessageServerHandler:" + incoming.remoteAddress() + "掉线");
-        handlerManager.offline(ctx);
+        logicManager.offline(ctx);
         ctx.fireChannelInactive();
     }
     /**

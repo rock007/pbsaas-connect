@@ -9,7 +9,8 @@ import java.io.*;
 /**
  * @author sam
  */
-public class MsgHeader {
+public class MsgHeader implements Serializable{
+
 
     private static final Logger logger = LoggerFactory.getLogger(MsgHeader.class);
 
@@ -20,6 +21,8 @@ public class MsgHeader {
 
     public static final int CLIENTVERSION = 200;
 
+    private String serviceId;
+
     //包头长度
     private int length;
 
@@ -28,6 +31,8 @@ public class MsgHeader {
 
     //操作类别
     private int cmdId;
+
+    private int actId;
 
     //消息序号
     private int seq;
@@ -112,5 +117,21 @@ public class MsgHeader {
 
     public void setBody(byte[] body) {
         this.body = body;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public int getActId() {
+        return actId;
+    }
+
+    public void setActId(int actId) {
+        this.actId = actId;
     }
 }

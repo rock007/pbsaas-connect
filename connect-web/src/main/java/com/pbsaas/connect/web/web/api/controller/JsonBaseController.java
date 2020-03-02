@@ -11,7 +11,6 @@ import javax.validation.ConstraintViolationException;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 
-import com.pbsaas.connect.proto.PaintFriend;
 import com.pbsaas.connect.web.web.model.JsonBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.pbsaas.connect.db.entity.Account;
-import com.pbsaas.connect.db.entity.ActLog;
-import com.pbsaas.connect.db.service.AccountService;
 
 /**
  * @author sam
@@ -37,8 +32,8 @@ import com.pbsaas.connect.db.service.AccountService;
 	
 	protected static SimpleDateFormat sd_yyyyMM = new SimpleDateFormat("yyyyMM");
 
-    @Autowired
-	AccountService accountService;
+    //@Autowired
+	//AccountService accountService;
 
 	@ExceptionHandler
 	public @ResponseBody  JsonBody<String> handleException(HttpServletRequest request, Exception ex){
@@ -66,15 +61,16 @@ import com.pbsaas.connect.db.service.AccountService;
 			url=url.substring(url.length()-260);
 		}
 		
-		addLog(url,"error",request.getQueryString(),ex.getLocalizedMessage(),request.getParameter("user_id"),request.getRemoteAddr());
+		//!!addLog(url,"error",request.getQueryString(),ex.getLocalizedMessage(),request.getParameter("user_id"),request.getRemoteAddr());
 		return new JsonBody<String>(-1,"操作失败，系统出现异常",ex.getMessage()); 
 	 }
-
+/**
 	protected void addLog(String title,String msg,String content,String error,String create_user,String  create_ip){
 		
 		ActLog log=new ActLog(title,msg,content,error,create_user,create_ip);
 		//eventBus.notify("quotes", Event.wrap(log));
 	}
+***/
 
 	public static String getCurDT(){	            
         return sd.format(new java.util.Date());
@@ -84,7 +80,7 @@ import com.pbsaas.connect.db.service.AccountService;
         return sd_yyyyMM.format(d);
 	}
 	
-
+/**
 	public  Account getAccInfo(){
 
         Account curUser=null;
@@ -96,7 +92,7 @@ import com.pbsaas.connect.db.service.AccountService;
 
 		return curUser;
 	}
-
+***/
 	public  UserDetails getCurUser(){
 
 		if(!SecurityContextHolder.getContext().getAuthentication().isAuthenticated()){
@@ -120,9 +116,10 @@ import com.pbsaas.connect.db.service.AccountService;
     }
 	protected boolean pushNotify(String text,String uid,Message params){
 
-        PaintFriend.ReqBody     req;
+		//PaintFriend.ReqBody req;
 
         try {
+            /**
             if(params!=null){
 
                 req = PaintFriend.ReqBody.newBuilder()
@@ -141,6 +138,7 @@ import com.pbsaas.connect.db.service.AccountService;
                         .setUid(uid)
                         .build();
             }
+            ***/
 
             /**!!
             if(!SendMsgQueue.getQueue().offer(req)){

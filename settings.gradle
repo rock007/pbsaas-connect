@@ -16,12 +16,13 @@ include 'services:webservice'
 */
 
 rootProject.name = 'pbsaas_connect'
-include 'connect-service-interface'
-include 'connect-service-provider'
+include 'connect-interface'
+include 'connect-provider'
 include 'connect-db'
 include 'connect-server'
 include 'connect-protobuf'
 include 'connect-web'
 include 'connect-core'
 include 'connect-turn'
+include 'eureka-server'
 

@@ -37,3 +37,7 @@ curl -X POST -d 'grant_type=password&username=admin&password=123456' --user 'adm
 
 ==20180104 坚持mars，短链接 长链接混合使用
 ==20180417 用户不使用id作为数据库关联主键，改用username[account_name]
+
+
+==
+ --add-opens java.base/jdk.internal.loader=ALL-UNNAMED

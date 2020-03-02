@@ -1,0 +1,106 @@
+package com.pbsaas.connect.web.webserver;
+
+import com.pbsaas.connect.proto.FriendListRspOuterClass.ChatFriendBuff;
+import com.pbsaas.connect.proto.FriendListRspOuterClass.FriendListRsp;
+import com.pbsaas.connect.proto.Connect;
+import com.google.protobuf.Any;
+import com.pbsaas.connect.db.entity.ChatFriend;
+import com.pbsaas.connect.db.entity.ChatFriendIds;
+import com.pbsaas.connect.db.service.FriendService;
+
+import com.pbsaas.connect.web.utils.LogUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.List;
+
+
+@Path("/")
+@Component
+public class GetMyFriendsCgi  {
+
+	private static final Logger logger = LoggerFactory.getLogger(GetMyFriendsCgi.class);
+
+	@Autowired
+	private FriendService friendService;
+	
+	@Path("/get-my-friends")
+    @POST()
+    @Consumes("application/octet-stream")
+    @Produces("application/octet-stream")
+    public Response get_my_friends(InputStream is) {
+        
+    	int result=1;
+    	String msg="获取数据成功";
+    	
+    	FriendListRsp friendList=FriendListRsp.newBuilder().build();
+    	
+		try {
+            final Connect.ReqBody request = Connect.ReqBody.parseFrom(is);
+
+            //!!logger.info(LogUtils.format("get_my_friends request from user=%s, text=%s", request.getUid(), request.getText()));
+
+			ChatFriend m=new ChatFriend();
+			m.setIds(new ChatFriendIds(request.getUid(),""));
+			m.setReq_status(1);
+			Page<ChatFriend> page= friendService.searchFriends(m, 0, 256);
+			
+			List<ChatFriendBuff> friends = new LinkedList<ChatFriendBuff>();
+			
+			for(ChatFriend friend:page.getContent()){
+				
+				ChatFriendBuff one=ChatFriendBuff.newBuilder()
+					.setNickName(friend.getNick_name())
+					.setAcceptDate(Long.valueOf(friend.getAccept_date().getTime()).toString())
+					.setSendFrom(friend.getIds().getFriend_user())
+					.setToUser(friend.getIds().getTo_user())
+					.setReqStatus(friend.getReq_status())
+					.setCreateDate(Long.valueOf(friend.getCreate_date().getTime()).toString())
+					.build();
+				
+				friends.add(one);
+			}
+			
+			friendList= FriendListRsp.newBuilder()
+										.addAllFriends(friends)
+										.build();
+
+        } catch (Exception e) {
+
+            logger.error("获得好友列表："+LogUtils.format("%s", e));
+
+            e.printStackTrace();
+
+            result=-100;
+        	msg="获取数据失败，系统出现异常";
+        }
+
+        final Connect.RespBody response = Connect.RespBody.newBuilder()
+        		//!!.setActid(Connect.CmdID.CMD_ID_MY_FRIENDS_VALUE)
+        		.setResult(result)
+        		.setMsg(msg)
+        		.setData(Any.pack(friendList))
+        		.build();
+        
+        final StreamingOutput stream = new StreamingOutput() {
+            public void write(OutputStream os) throws IOException {
+                response.writeTo(os);
+            }
+        };
+        return Response.ok(stream).build();
+        
+    }
+}

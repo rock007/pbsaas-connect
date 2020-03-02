@@ -4,10 +4,10 @@ version = '0.0.1-SNAPSHOT'
 buildscript {
     ext {
         springBootVersion = '2.1.6.RELEASE'
-        springCloudVersion ='Greenwich.SR2'
+        springCloudVersion ='Greenwich.SR3'
         hazelcastVersion='3.9.4'
         // JDK 版本
-        JDKVersion = 1.8
+        JDKVersion = 11
         // 编码
         Encoding = "UTF-8"
     }
@@ -33,6 +33,7 @@ allprojects {
         tasks.withType(JavaCompile) {
             options.encoding = "UTF-8"
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+
         }
     }
 }
@@ -43,7 +44,7 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
 
     // 设置编码
-    [compileJava, compileTestJava, javadoc]*.options*.encoding = Encoding
+   // [compileJava, compileTestJava, javadoc]  *.options*.encoding = Encoding
 
     // JDK 版本号要求
     sourceCompatibility = JDKVersion
@@ -59,11 +60,11 @@ subprojects {
         compile 'org.reflections:reflections:0.9.10'
         //jdk11
         /******/
-        compile 'javax.annotation:javax.annotation-api:1.3.2'
-        compile 'javax.xml.bind:jaxb-api:2.3.0'
-        compile 'com.sun.xml.bind:jaxb-core:2.3.0'
-        compile 'com.sun.xml.bind:jaxb-impl:2.3.0'
-        compile 'activation:activation:1.0.2'
+        compile 'javax.annotation:javax.annotation-api:+'
+        compile 'javax.xml.bind:jaxb-api:+'
+        compile 'com.sun.xml.bind:jaxb-core:+'
+        compile 'com.sun.xml.bind:jaxb-impl:+'
+        compile 'activation:activation:+'
 
     }
     dependencyManagement {
