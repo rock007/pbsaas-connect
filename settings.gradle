@@ -25,4 +25,5 @@ include 'connect-web'
 include 'connect-core'
 include 'connect-turn'
 include 'eureka-server'
+include 'connect-framework'
 

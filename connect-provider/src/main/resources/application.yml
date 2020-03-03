@@ -19,6 +19,13 @@ spring:
             hibernate:
                 dialect : org.hibernate.dialect.MySQL5Dialect
 
+#
+dao:
+  sql:
+    dbType: MySQL
+    template: freemarker
+    path: classpath:config/sql/*.xml
+
 application:
   uploadDir: upload2
   uploadRootDir: D:\\temp\\files_dir

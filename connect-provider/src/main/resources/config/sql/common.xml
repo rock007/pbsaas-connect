@@ -1,0 +1,947 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqls>
+
+    <sql id="common.PromotersApply" type="freemarker">
+        <![CDATA[
+       SELECT
+           c.name,c.mobile,
+           (select count(1) from credit_apply_info a where a.user_id=c.id),
+           (select count(1) from apply_borrow d  where d.user_id=c.id)
+        FROM m_user c inner join t_user_invitaion b on b.user_id=c.id and b.invitation_id=#{userId}
+
+    ]]>
+    </sql>
+
+    <sql id="common.daiKouOrderList" type="freemarker">
+        <![CDATA[
+       SELECT *
+        FROM t_daikou_order
+        where
+        user_id=#{userId}
+        and card_id=#{cardId}
+        and status <> '999'
+        order by create_time desc
+
+    ]]>
+    </sql>
+
+
+    <sql id="common.checkDaiKouOrder" type="freemarker">
+        <![CDATA[
+       SELECT *
+        FROM t_daikou_order
+        where
+        card_id=#{cardId}
+        and status in ('0','99')
+
+    ]]>
+    </sql>
+
+    <sql id="common.deleteDaiKouMxOrder" type="freemarker">
+        <![CDATA[
+        delete
+        FROM t_daikou_order_details
+        where
+        order_id=#{orderId}
+    ]]>
+    </sql>
+
+    <sql id="common.daiKouOrderListDetail" type="freemarker">
+        <![CDATA[
+       SELECT *
+        FROM t_daikou_order_details
+        where
+        order_id=#{orderId}
+        order by create_time
+
+    ]]>
+    </sql>
+
+
+    <sql id="common.getTianfubaoInfo" type="freemarker">
+        <![CDATA[
+        SELECT
+            money,status,create_time,'天下付'
+        FROM
+            t_tianfubao_info t
+        WHERE
+            t.user_id = #{userId}
+        order by create_time desc
+    ]]>
+    </sql>
+
+    <sql id="common.getYiFeng" type="freemarker">
+        <![CDATA[
+        SELECT
+            amount,order_status,create_time,'易沣'
+        FROM
+            recharge_record t
+        WHERE
+            t.user_id = #{userId}
+            order by create_time desc
+    ]]>
+    </sql>
+
+    <sql id="common.getYiFengUnionTianfubaoInfo">
+        <![CDATA[
+            SELECT
+                money AS amount,
+                `status`,
+                create_time,
+                '天下付' AS `qd`
+            FROM
+                t_tianfubao_info t
+            WHERE
+                t.user_id = #{userId} UNION ALL
+            SELECT
+                amount,
+                order_status AS `status`,
+                create_time,
+                '易沣' AS `qd`
+            FROM
+                recharge_record t
+            WHERE
+                t.user_id = #{userId}
+            order by `create_time` desc
+        ]]>
+    </sql>
+
+
+
+    <!-- 获取用户余额 -->
+    <sql id="common.getUserSumAmount" type="freemarker">
+    <![CDATA[
+        SELECT
+            COALESCE (sum_in, 0) - COALESCE (sum_out, 0) sum_amount
+        FROM
+            (
+                SELECT
+                    (
+                        SELECT
+                            sum(t.amount)
+                        FROM
+                            m_user_bill t
+                        WHERE
+                            t.user_id = #{userId}
+                        AND t.type = 1
+                    ) sum_in,
+                    (
+                        SELECT
+                            sum(t.amount)
+                        FROM
+                            m_user_bill t
+                        WHERE
+                            t.user_id = #{userId}
+                        AND t.type = 0
+                    ) sum_out
+            ) a
+    ]]>
+    </sql>
+
+    <!-- 获取用户的历史提现金额 -->
+    <sql id="common.getUserSumWithDraw" type="freemarker">
+    <![CDATA[
+        SELECT
+            COALESCE (sum(t.amount), 0)
+        FROM
+            m_user_bill t
+        WHERE
+            t.business_type = 2
+        AND t.user_id = #{userId}
+    ]]>
+    </sql>
+
+
+    <!--查询提现审核-->
+    <sql id="common.queryTUserMoneyInfoPage" type="freemarker">
+        <![CDATA[
+        SELECT
+            t.id,t.status,m.name as user_id,t.amount,t.audit_Remark,t.create_Time,
+            t.credit_card_amount,t.money_type,t.remark,t.provider_userid
+        FROM
+            t_user_money_info t left join m_user m  on t.user_id=m.id
+        WHERE
+          t. money_Type = 3
+
+
+        <#if startDateStr?? &&  startDateStr != "">
+            AND t.create_time >= STR_TO_DATE(
+                #{startDateStr},
+                '%Y-%m-%d %H:%i:%s'
+            )
+        </#if>
+        <#if endDateStr?? &&  endDateStr != "">
+            AND t.create_time < STR_TO_DATE(
+                #{endDateStr},
+                '%Y-%m-%d %H:%i:%s'
+            )
+        </#if>
+        order by t.create_time desc
+    ]]>
+    </sql>
+
+    <!--我的下级分润-->
+    <sql id="common.queryMyOffline" type="freemarker">
+        <![CDATA[
+            SELECT
+               *
+            FROM
+                my_offline_view t
+            WHERE 1=1
+            AND t.invitation_id = #{userId}
+           order by t.date_created desc
+
+
+    ]]>
+    </sql>
+
+
+    <!-- 我的分润记录 -->
+    <sql id="common.queryMySuperior" type="freemarker">
+        <![CDATA[
+           SELECT
+           a.create_time,a.amount,b.name,c.user_level_name
+           FROM t_user_money_info a INNER JOIN m_user b on a.provider_userid=b.id INNER JOIN t_user_score c on b.level=c.user_level
+           WHERE
+           a.money_type=1
+            and
+           a.user_id=#{userId}
+           order by a.create_time desc
+    ]]>
+    </sql>
+
+    <!-- 我的推广员认证情况已认证 -->
+    <sql id="common.queryMyOfflineNumY" type="freemarker">
+        <![CDATA[
+        SELECT
+            sum(1)
+        FROM t_user_invitaion
+        WHERE
+         invitation_id= #{userId} and is_real=1
+    ]]>
+    </sql>
+
+    <!-- 我的推广员认证情况未认证 -->
+    <sql id="common.queryMyOfflineNumW" type="freemarker">
+        <![CDATA[
+        SELECT
+            sum(1)
+        FROM t_user_invitaion
+        WHERE
+         invitation_id= #{userId} and is_real=0
+    ]]>
+    </sql>
+
+
+    <!-- 我的提现记录 -->
+    <sql id="common.queryMyTixian" type="freemarker">
+        <![CDATA[
+        SELECT
+            amount,status,create_time
+        FROM t_user_money_info
+        WHERE money_type=3 and user_id=#{userId}
+        order by create_time desc
+    ]]>
+    </sql>
+
+
+    <!-- 公告 -->
+    <sql id="common.queryGg" type="freemarker">
+        <![CDATA[
+        SELECT
+            notice_context
+        FROM
+            t_notice
+        WHERE status=1
+        order by sort
+    ]]>
+    </sql>
+
+    <!-- 查询提现申请视图 -->
+    <sql id="common.queryWithDraw" type="freemarker">
+    <![CDATA[
+        SELECT
+            *
+        FROM
+            withdraw_apply_view t
+        WHERE
+            1 = 1
+        <#if status??>
+            AND t. STATUS = #{status}
+        </#if>
+        <#if userId??>
+            AND t.user_id = #{userId}
+        </#if>
+        <#if startDateStr??>
+            AND t.date_created >= STR_TO_DATE(
+                #{startDateStr},
+                '%Y-%m-%d %H:%i:%s'
+            )
+        </#if>
+        <#if endDateStr??>
+            AND t.date_created < STR_TO_DATE(
+                #{endDateStr},
+                '%Y-%m-%d %H:%i:%s'
+            )
+        </#if>
+        order by t.date_created desc
+    ]]>
+    </sql>
+
+    <!-- 分页查询会员 -->
+    <sql id="common.queryMUserPage" type="freemarker">
+    <![CDATA[
+        SELECT
+            t.id,t.use_Status,t.login_Name,t.name,t.mobile,t.identity_No,t.level,t.date_Created,ifnull((select count(1) from t_user_invitaion a where a.invitation_id=t.id),0) as invited_num,t.share_image_url,t.hb_share_image_url,
+            password,password_salt,pay_pass,inviter_mobile,email,branch_code,account,id_card_face,id_card_ne,bank_card_no,bank_card_mag,last_login_time,certification,certification_date,validind,bank_name,bank_sub_name,idt_card_handle,quick_value,device_type,province,city,channel_id,nick_name,wx_photo,token,open_id
+        FROM
+            m_user t
+        WHERE
+            1 = 1
+        <#if loginName?? && loginName != "">
+            AND t.login_name LIKE concat('%', #{loginName}, '%')
+        </#if>
+        <#if name?? && name != "">
+            AND t.NAME LIKE concat('%', #{name}, '%')
+        </#if>
+        <#if certification??>
+            AND t.certification = #{certification}
+        </#if>
+
+        <#if orderBy??>
+            ORDER BY
+            <@forEach data=orderBy item="it" separator=",">
+                ${it}
+            </@forEach>
+            ${sort}
+        </#if>
+    ]]>
+    </sql>
+
+
+
+    <!-- 分页查询我的推广员 -->
+    <sql id="common.queryPromotersNum" type="freemarker">
+        <![CDATA[
+
+        SELECT
+                c.name,c.mobile,c.identity_no,c.level
+            FROM m_user a INNER JOIN t_user_invitaion b
+                ON b.invitation_id=a.id and a.id= #{id}
+                inner join m_user c on b.user_id=c.id
+            WHERE 1=1
+                <#if mobile??>
+                AND c.mobile = #{mobile}
+                </#if>
+            ORDER BY c.date_created desc
+
+    ]]>
+    </sql>
+
+
+    <!-- 分页查询会员 -->
+    <sql id="common.queryTNoticePage" type="freemarker">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_notice t
+        WHERE
+            1 = 1
+        <#if noticeContext?? && noticeContext != "">
+            AND t.notice_context LIKE concat('%', #{noticeContext}, '%')
+        </#if>
+
+
+            ORDER BY
+            sort asc
+
+    ]]>
+    </sql>
+
+
+    <!-- 分页查询会员 -->
+    <sql id="common.querySysCode" type="freemarker">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_base_code t
+        WHERE
+            1 = 1
+        <#if action?? && action != "">
+            AND t.action LIKE concat('%', #{action}, '%')
+        </#if>
+        <#if name?? && name != "">
+            AND t.name LIKE concat('%', #{name}, '%')
+        </#if>
+        <#if remark?? && remark != "">
+            AND t.remark LIKE concat('%', #{remark}, '%')
+        </#if>
+
+    ]]>
+    </sql>
+
+    <!-- 根据代码类型查询全部字典数据 -->
+    <sql id="common.findAllByCodeType" type="freemarker">
+    <![CDATA[
+        SELECT
+            *
+            FROM
+            c_codetrans t
+            WHERE
+            t.codetype = #{codeType}
+            AND t.validind = '1'
+            ORDER BY
+            t.display_no
+    ]]>
+    </sql>
+
+    <!-- 根据用户ID查询用户的分润记录 -->
+    <sql id="common.getUserProfitLogs" type="freemarker">
+    <![CDATA[
+        SELECT
+            t.recharge_amount,
+            t.amount,
+            t.invited_user_id,
+            u.login_name invited_user_login_name,
+            u. NAME invited_user_name,
+            u. LEVEL invited_user_level,
+            t.date_created
+        FROM
+            profit_log t,
+            m_user u
+        WHERE
+            t.invited_user_id = u.id
+        AND t.user_id = #{userId}
+        ORDER BY
+            t.date_created desc
+    ]]>
+    </sql>
+
+    <!-- 根据用户ID查询用户的推广员的分润汇总 -->
+    <sql id="common.getUserInvitersProfit" type="freemarker">
+    <![CDATA[
+        SELECT
+            t.invited_user_id,
+            sum(t.amount) amount
+        FROM
+            profit_log t
+        WHERE
+            t.user_id = #{userId}
+        GROUP BY
+            t.invited_user_id
+    ]]>
+    </sql>
+
+    <!-- 查询费率信息列表 -->
+    <sql id="common.findShareRateList" type="freemarker">
+    <![CDATA[
+        SELECT
+            r.type,
+            c.codename NAME,
+            r. LEVEL,
+            r.rate,
+            20000 limit_amount
+        FROM
+            c_share_rate r,
+            c_codetrans c
+        WHERE
+            r.type = c.CODE
+        AND c.codetype = 'payMethod'
+        AND c.validind='1'
+        <#if level??>
+            AND r.LEVEL = #{level}
+        </#if>
+        ORDER BY
+            r.date_created
+    ]]>
+    </sql>
+
+    <!-- 分页查询订单 -->
+    <sql id="common.findOrderPage" type="freemarker">
+    <![CDATA[
+        select * from order_view t
+            where 1 = 1
+        <#if type?? && type != "">
+            and t.type = #{type}
+        </#if>
+        <#if name?? && name != "">
+            and t.name like concat('%', #{name}, '%')
+        </#if>
+    ]]>
+    </sql>
+
+
+    <!-- ********************************************************查询******************************************************** -->
+   <!-- 用户邀请记录表 -->
+    <sql id="common.findUserInvitaion" type="freemarker">
+        <![CDATA[
+        select count(id) from t_user_invitaion
+        where 1 = 1
+        <#if userId?? && userId != "">
+            and user_id = #{userId}
+        </#if>
+        <#if invitationId?? && invitationId != "">
+            and invitation_id = #{invitationId}
+        </#if>
+        <#if isReal?? && isReal != "">
+            and is_real = #{isReal}
+        </#if>
+    ]]>
+    </sql>
+
+
+    <!--  用户账户历史统计 分润总额，结算总额，提现总额等 -->
+    <sql id="common.getUserSumMoney" type="freemarker">
+        <![CDATA[
+        SELECT
+            IFNULL(sum(amount),0)
+        FROM
+            t_user_money_info
+        WHERE
+            1 = 1
+        <#if userId?? && userId != "">
+            and user_id = #{userId}
+        </#if>
+         <#if moneyType?? && moneyType != "">
+            and money_type = #{moneyType}
+        </#if>
+        <#if status?? && status != "">
+            and status = #{status}
+        </#if>
+    ]]>
+    </sql>
+
+
+    <!--  去重获取省市区 -->
+    <sql id="common.getAreaCode" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_area_code
+        WHERE
+            1 = 1
+        <#if type== "1">
+          GROUP BY province_code
+        </#if>
+        <#if type== "2">
+          and province_code = #{provinceCode}
+          GROUP BY city_code
+        </#if>
+         <#if type== "3">
+          and city_code = #{cityCode}
+          GROUP BY area_code
+        </#if>
+        ]]>
+    </sql>
+
+
+    <sql id="common.getCityName" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_area_code
+        WHERE
+            area_code = #{areaCode}
+        ]]>
+    </sql>
+
+    <!--  去重查询所有的支行  -->
+    <sql id="common.getSubBank" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_sub_bank_info
+        WHERE
+            1 = 1
+         <#if bankCode?? && bankCode != "">
+            and bank_code = #{bankCode}
+        </#if>
+        <#if subBankName?? && subBankName != "">
+            and sub_bank_name LIKE concat('%', #{subBankName}, '%')
+        </#if>
+        ]]>
+    </sql>
+
+
+    <!-- 获取公告 -->
+    <sql id="common.getNoticeModelListByPage" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_notice
+        WHERE
+            1 = 1
+         <#if status?? && status != "">
+            and status = #{status}
+        </#if>
+        order by sort,create_time
+        ]]>
+    </sql>
+
+
+    <!-- 获取公告 -->
+    <sql id="common.getLogNotice" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_log_notice
+        WHERE
+            1 = 1
+
+        order by create_time desc
+        limit 0,5
+        ]]>
+    </sql>
+
+    <!-- 获取历史列表 -->
+    <sql id="common.getBigDataInfoHistory" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_big_data_info
+        WHERE
+            1 = 1
+            and status = #{status}
+            and user_id = #{userId}
+        order by create_time desc
+        ]]>
+    </sql>
+
+
+
+
+
+
+
+
+    <sql id="common.getFenrun" type="freemarker">
+        <![CDATA[
+        SELECT
+            COALESCE (t.fenrun_money, 0)
+        FROM
+            m_user_bill t
+        WHERE
+            t.user_id = #{userId}
+    ]]>
+    </sql>
+
+    <!-- 获取短信的最新一条的详情 -->
+    <sql id="common.getAuCodeInfo" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_auth_code
+        WHERE
+            1 = 1
+        <#if mobile?? && mobile != "">
+            and mobile = #{mobile}
+        </#if>
+        <#if isUse?? && isUse != "">
+            and is_use = #{isUse}
+        </#if>
+        order by create_time desc
+        limit 0,1
+        ]]>
+    </sql>
+
+    <sql id="common.getFenrunHistory" type="freemarker">
+        <![CDATA[
+        SELECT
+            COALESCE (sum(t.amount), 0)
+        FROM
+            t_user_money_info t
+        WHERE
+            t.money_type = 2
+        AND t.user_id = #{userId}
+    ]]>
+    </sql>
+
+
+
+    <sql id="common.getTixian" type="freemarker">
+        <![CDATA[
+        SELECT
+            COALESCE (t.tixian_money, 0)
+        FROM
+            m_user_bill t
+        WHERE
+            t.user_id = #{userId}
+    ]]>
+    </sql>
+
+    <sql id="common.getTixianHistory" type="freemarker">
+        <![CDATA[
+        SELECT
+            COALESCE (sum(t.amount), 0)
+        FROM
+            t_user_money_info t
+        WHERE
+            t.money_type = 3 and t.status=1
+        AND t.user_id = #{userId}
+
+    ]]>
+    </sql>
+
+    <!-- 获取省列表 -->
+    <sql id="common.getProvince" type="freemarker">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_city t
+        WHERE
+            t.level = 1
+    ]]>
+    </sql>
+
+
+    <!-- 获取市列表 -->
+    <sql id="common.getCity" type="freemarker">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_city t
+        WHERE
+            t.level = 2
+        AND t.province_id = #{provinceId}
+    ]]>
+    </sql>
+
+    <!-- 获取区列表 -->
+    <sql id="common.getArea" type="freemarker">
+        <![CDATA[
+        SELECT
+            *
+        FROM
+            t_city t
+        WHERE
+            t.level = 3
+        AND t.city_id = #{cityId}
+    ]]>
+    </sql>
+
+
+
+    <sql id="common.queryMyTeamNum" type="freemarker">
+        <![CDATA[
+            select (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId}),
+            (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId} and level='1'),
+            (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId} and level='2'),
+            (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId} and level='3'),
+            (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId} and level='4'),
+            (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId} and level in ('2','3','4')),
+            (select count(1) from  t_user_invitaion a inner join m_user b on a.user_id=b.id where a.invitation_id=#{userId} and to_days(date_created) = to_days(now()))
+            from dual
+        ]]>
+    </sql>
+
+
+    <sql id="common.queryMyTeam" type="freemarker">
+        <![CDATA[
+            SELECT
+                b.nick_name,b.mobile,b.level,b.certification,b.date_created,b.wx_photo,b.name,b.id
+            FROM  t_user_invitaion a inner join m_user b on a.user_id=b.id
+            WHERE a.invitation_id=#{userId}
+            order by date_created desc;
+
+        ]]>
+    </sql>
+
+
+
+    <sql id="common.queryContent" type="freemarker">
+        <![CDATA[
+            SELECT
+                    *
+            FROM  sys_content
+            where status=0
+            order by sort asc ,last_time desc
+        ]]>
+    </sql>
+
+    <!--查询贷款的列表-->
+    <sql id="common.findLoanInfoByPage" type="freemarker">
+        <![CDATA[
+         SELECT
+           *
+        FROM
+            t_loan_info
+        WHERE
+            1 = 1
+        <#if loanType?? && loanType != "">
+            and loan_type = #{loanType}
+        </#if>
+        <#if loanTypes??>
+            and loan_type in (
+                    <@forEach data=loanTypes item="loanType" separator=",">
+                        #{loanType}
+                    </@forEach>
+                )
+        </#if>
+        <#if productDimension?? && productDimension != "">
+            and product_dimension LIKE concat('%', #{productDimension}, '%')
+        </#if>
+        <#if status?? && status != "">
+            and status = #{status}
+        </#if>
+        order by sort asc
+        ]]>
+    </sql>
+
+
+    <!-- ********************************************************代扣相关******************************************************** -->
+    <!-- 查询用户的代扣信用卡，储蓄卡列表 -->
+    <sql id="common.getCreditCardList" type="freemarker">
+        <![CDATA[
+        select * from t_daikou_user_card
+            where 1 = 1
+        <#if sysUserId?? && sysUserId != "">
+            and sys_user_id = #{sysUserId}
+        </#if>
+        <#if type?? && type != "">
+            and type = #{type}
+        </#if>
+    ]]>
+    </sql>
+
+
+    <!-- 查询指定订单已完成的金额 -->
+    <sql id="common.getComplePlanMoney" type="freemarker">
+        <![CDATA[
+        select sum(amount) from t_daikou_order_details
+            where 1 = 1
+        <#if orderId?? && orderId != "">
+            and order_id = #{orderId}
+        </#if>
+            and status = '2'
+            and op_type='1'
+
+    ]]>
+    </sql>
+
+    <sql id="common.getCreditApplyOrder" type="freemarker">
+        <![CDATA[
+        select
+            credit.id,
+            credit.order_no,
+            credit.credit_no,
+            credit.user_id,
+            credit.identity_card,
+            credit.user_name,
+            credit.phone_no,
+            credit.channel_code,
+            credit.status,
+            credit.create_date,
+            credit.update_date
+        from
+            m_user u
+            inner join credit_apply_info credit on u.id = credit.user_id
+        where
+            1 = 1
+            <#if status??>
+                and credit.status = #{status}
+            </#if>
+            <#if userIds??>
+                and u.id in (
+                    <@forEach data=userIds item="userId" separator=",">
+                        #{userId}
+                    </@forEach>
+                )
+            </#if>
+            <#if queryText?? && queryText != "">
+                and (u.name like concat('%',#{queryText},'%') or u.mobile like concat('%',#{queryText},'%'))
+            </#if>
+            order by credit.create_date desc
+    ]]>
+    </sql>
+
+    <!--查询分润明细列表 -->
+    <sql id="common.queryFenRunLog" type="freemarker">
+        <![CDATA[
+        select * from t_fenrun_log
+            where 1 = 1
+        <#if superiorId?? && superiorId != "">
+            and superior_id = #{superiorId}
+        </#if>
+          <#if type?? && type != "">
+            and type = #{type}
+        </#if>
+    ]]>
+    </sql>
+
+
+    <sql id="common.getBorrowApplyOrder" type="freemarker">
+        <![CDATA[
+        select
+           id,order_no,identity_no,amount,deadline,user_name,user_id,mobile,professional,province,city,is_creditcard,is_accumulation_fund,house_type,
+           is_car,is_insurance_policy,borrow_type,car_type,is_marriage,is_business_license,car_license,house_license,area_license,business_license,status,create_time,
+           house_status,(select title from t_loan_info b where a.borrow_name=b.borrow_name) as borrow_name,taxes_money
+        from
+            apply_borrow a
+        where
+            1 = 1
+             <#if status??>
+                and status = #{status}
+            </#if>
+            <#if userIds??>
+                and a.user_id in (
+                    <@forEach data=userIds item="userId" separator=",">
+                        #{userId}
+                    </@forEach>
+                )
+            </#if>
+            <#if queryText?? && queryText != "">
+                and (a.user_name like concat('%',#{queryText},'%') or a.mobile like concat('%',#{queryText},'%'))
+            </#if>
+            order by create_time desc
+    ]]>
+    </sql>
+
+    <sql id="common.getBigDataOrder" type="freemarker">
+        <![CDATA[
+        select
+            info.id,
+            info.order_no,
+            info.credit_no,
+            info.big_data_type,
+            info.company_name,
+            info.big_data_back,
+            info.status,
+            info.create_time,
+            info.report_id,
+            u.mobile,
+            u.id user_id,
+            u.name user_name
+        from
+            t_big_data_info info
+            inner join m_user u on u.id = info.user_id
+        where
+            1 = 1
+            <#if payStatus??>
+                and status = #{payStatus}
+            </#if>
+            <#if userIds??>
+                and u.id in (
+                    <@forEach data=userIds item="userId" separator=",">
+                        #{userId}
+                    </@forEach>
+                )
+            </#if>
+            <#if queryText?? && queryText != "">
+                and (u.name like concat('%',#{queryText},'%') or u.mobile like concat('%',#{queryText},'%'))
+            </#if>
+        order by info.create_time desc
+    ]]>
+    </sql>
+
+</sqls>

@@ -10,7 +10,4 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
-    compile 'org.freemarker:freemarker:2.3.28'
-    compile 'org.codehaus.groovy:groovy-all:+'
-    compile 'com.github.jsqlparser:jsqlparser:1.1'
 }

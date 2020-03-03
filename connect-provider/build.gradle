@@ -8,10 +8,13 @@ bootJar {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
+    compile project(":connect-core")
+    compile project(":connect-framework")
     compile project(":connect-db")
     compile project(":connect-interface")
 
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-redis")
 
     compile("org.springframework.cloud:spring-cloud-starter-netflix-hystrix")
     compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")

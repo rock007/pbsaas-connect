@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringCloudApplication
 @EnableEurekaClient
-@ComponentScan(basePackages ={ "com.pbsaas.connect.service","com.pbsaas.connect.db.service"})
+@ComponentScan(basePackages ={ "com.pbsaas.connect.framework","com.pbsaas.connect.service","com.pbsaas.connect.db.service"})
 @EnableJpaRepositories(basePackages ={ "com.pbsaas.connect.db.repository"})
 @EntityScan(basePackages ={ "com.pbsaas.connect.db.entity"})
 public class ProviderServiceApplication {

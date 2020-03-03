@@ -12,4 +12,6 @@ public class AppConstants {
     public static final String CON_SESSION_USER_ROLE="CON_SESSION_USER_ROLE";
 
     public static final String CON_SESSION_USER_NAME="CON_SESSION_USER_NAME";
+
+    public static final String SUB_LOG_TOPIC="/connect/logs";
 }

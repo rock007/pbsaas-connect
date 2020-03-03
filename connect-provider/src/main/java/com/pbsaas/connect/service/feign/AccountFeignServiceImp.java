@@ -1,12 +1,9 @@
 package com.pbsaas.connect.service.feign;
 
-import java.util.List;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
+import com.pbsaas.connect.db.repository.AccountRepository;
+import com.pbsaas.connect.db.repository.AccountRolesRepository;
+import com.pbsaas.connect.framework.dao.SqlDynamicExec;
+import com.pbsaas.connect.framework.dao.impl.JpaDao;
 import com.pbsaas.connect.model.dto.ModifyAccountDTO;
 import com.pbsaas.connect.model.dto.RegistAccountDTO;
 import com.pbsaas.connect.model.dto.SearchAccountDTO;
@@ -30,6 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class AccountFeignServiceImp  implements AccountFeignService {
+
+	@Autowired
+	private AccountRepository accountRepository;
+
+	@Autowired
+	private AccountRolesRepository accountRolesRepository;
+
+	@Autowired
+	private JpaDao jpaDao;
+
+	@Autowired
+	private SqlDynamicExec sqlDynamicExec;
 
 	@Override
 	public AccountVO findById(String id) {
