@@ -8,6 +8,9 @@ server:
      enabled: false
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
+
   application:
     name: connect-web
     index: 1

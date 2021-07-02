@@ -4,11 +4,12 @@
 package com.pbsaas.connect.server.mars.logic;
 
 import com.google.protobuf.MessageLite;
+import com.pbsaas.connect.core.model.MsgHeader;
+import com.pbsaas.connect.core.model.ProtoMessage;
 import com.pbsaas.connect.core.utils.CommonUtils;
 import com.pbsaas.connect.proto.Connect;
 import com.pbsaas.connect.server.mars.handler.MessageServerHandler;
-import com.pbsaas.connect.server.mars.model.MsgHeader;
-import com.pbsaas.connect.server.mars.model.ProtoMessage;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
@@ -24,7 +25,7 @@ public class ClientUser {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private long userId;
+    private String userId;
     private String loginName;
     private String nickName;
     private boolean updated;
@@ -35,13 +36,15 @@ public class ClientUser {
     private List<ChannelHandlerContext> unValidateConnSet = new ArrayList<>();
 
     public static final AttributeKey<Long> HANDLE_ID = AttributeKey.valueOf("HANDLE_ID");
-    public static final AttributeKey<Long> USER_ID = AttributeKey.valueOf("USER_ID");
+    public static final AttributeKey<String> USER_ID = AttributeKey.valueOf("USER_ID");
+
+    //客户端类型
     public static final AttributeKey<Connect.ClientType> CLIENT_TYPE = AttributeKey.valueOf("CLIENT_TYPE");
     public static final AttributeKey<Connect.StateType> STATUS = AttributeKey.valueOf("STATUS");
 
     public ClientUser() {
         this.validate = false;
-        this.userId = 0;
+        this.userId = "";
         this.updated = false;
         this.status = Connect.StateType.STATE_OFFLINE_VALUE;
     }
@@ -55,7 +58,7 @@ public class ClientUser {
     /**
      * @param ctx
      */
-    public ClientUser(ChannelHandlerContext ctx, long userId, long handleId, Connect.ClientType clientType, Connect.StateType statType) {
+    public ClientUser(ChannelHandlerContext ctx, String userId, long handleId, Connect.ClientType clientType, Connect.StateType statType) {
         this();
         this.userId = userId;
         this.connMap.put(handleId, ctx);
@@ -78,6 +81,7 @@ public class ClientUser {
     }
 
     public ChannelHandlerContext getUnvalidateConn(long handle) {
+
         for (ChannelHandlerContext clientConn: unValidateConnSet) {
             if (clientConn.channel().attr(HANDLE_ID).get() == handle) {
                 return clientConn;
@@ -242,16 +246,13 @@ public class ClientUser {
         return connMap.isEmpty();
     }
 
-    /**
-     * @return the userId
-     */
-    public long getUserId() {
+    public String getUserId() {
         return userId;
     }
     /**
      * @param userId the userId to set
      */
-    public void setUserId(long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
     /**
@@ -329,34 +330,25 @@ public class ClientUser {
     }
 
     public static class UserConn {
-        private long userId;
+        private String userId;
         private int connCount;
 
-        public UserConn(long userId, int count) {
+        public UserConn(String userId, int count) {
             this.userId = userId;
             this.connCount = count;
         }
-        /**
-         * @return the userId
-         */
-        public long getUserId() {
+        public String getUserId() {
             return userId;
         }
-        /**
-         * @param userId the userId to set
-         */
-        public void setUserId(long userId) {
+
+        public void setUserId(String userId) {
             this.userId = userId;
         }
-        /**
-         * @return the connCount
-         */
+
         public int getConnCount() {
             return connCount;
         }
-        /**
-         * @param connCount the connCount to set
-         */
+
         public void setConnCount(int connCount) {
             this.connCount = connCount;
         }

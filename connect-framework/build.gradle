@@ -1,24 +1,27 @@
 apply plugin: 'java-library'
-
-group 'com.pbsaas.connect'
-version '0.0.1-SNAPSHOT'
+apply plugin: 'io.spring.dependency-management'
 
 version '0.0.1-SNAPSHOT'
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile project(":connect-core")
+    compileOnly 'ch.qos.logback:logback-classic:1.2.3'
 
-    compile 'org.hibernate:hibernate-core:5.3.7.Final'
+    compileOnly  'javax.servlet:servlet-api:2.5'
+    api  ('com.baidu.unbiz:fluent-validator:1.0.9') {
+        exclude group: 'org.slf4j'
+    }
 
-    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
-    compile 'org.springframework:spring-core:5.1.8.RELEASE'
-    compile 'org.springframework:spring-jdbc:5.1.8.RELEASE'
+    implementation 'org.hibernate:hibernate-core:5.3.7.Final'
+    implementation 'org.springframework:spring-core:5.1.8.RELEASE'
+    compileOnly 'org.springframework:spring-jdbc:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-web:5.1.8.RELEASE'
 
-    compile 'org.springframework:spring-context-support:5.1.8.RELEASE'
-    compile 'org.springframework:spring-context:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-context-support:5.1.8.RELEASE'
+    implementation 'org.springframework:spring-context:5.1.8.RELEASE'
 
-    compile 'org.freemarker:freemarker:2.3.28'
-    compile 'org.codehaus.groovy:groovy-all:+'
-    compile 'com.github.jsqlparser:jsqlparser:1.1'
+    implementation 'org.freemarker:freemarker:2.3.28'
+    implementation 'org.codehaus.groovy:groovy-all:+'
+    implementation 'com.github.jsqlparser:jsqlparser:1.1'
 }

@@ -2,9 +2,10 @@ package com.pbsaas.connect.server.mars.coder;
 
 import java.util.List;
 
+import com.pbsaas.connect.core.model.MsgHeader;
+import com.pbsaas.connect.core.model.ProtoMessage;
 import com.pbsaas.connect.proto.Connect;
-import com.pbsaas.connect.server.mars.model.MsgHeader;
-import com.pbsaas.connect.server.mars.model.ProtoMessage;
+import com.pbsaas.connect.server.mars.connect.ProtobufParseMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,7 @@ public final class PacketDecoder extends ByteToMessageDecoder {
 
             DataBuffer dataBuf = new DataBuffer(in);
 
-            MsgHeader header = new MsgHeader();
-            header.decode(dataBuf);
+            MsgHeader header =DataBufferCoder.decode(dataBuf);
 
             if (header.getLength() < 0) {
                 ctx.close();
@@ -46,7 +46,6 @@ public final class PacketDecoder extends ByteToMessageDecoder {
                 return;
             }
 
-            /**
             ByteBuf byteBuf = ctx.alloc().buffer(header.getLength() - MsgHeader.FIXED_HEADER_SKIP);
 
             in.readBytes(byteBuf);
@@ -58,14 +57,15 @@ public final class PacketDecoder extends ByteToMessageDecoder {
                 byteBuf.readBytes(body);
             }
 
-            MessageLite msg = ProtobufParseMap.getMessage(header.getServiceId(), header.getCommandId(), body);
-
+            MessageLite msg = ProtobufParseMap.getMessage(header.getCmdId(), header.getActId(), body);
             ProtoMessage<MessageLite> protoMessage = new ProtoMessage<>(header, msg);
-            **/
+            out.add(protoMessage);
+
+            /**
             final Connect.ReqBody request = Connect.ReqBody.parseFrom(header.getBody());
 
             out.add(request);
-            
+            ***/
             logger.trace("Received protobuf : length={}, commandId={}", header.getLength(), header.getCmdId());
         } catch (Exception e) {
             logger.error(ctx.channel().remoteAddress() + ",decode failed.", e);

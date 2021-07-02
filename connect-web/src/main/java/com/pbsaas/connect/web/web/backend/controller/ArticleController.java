@@ -1,5 +1,6 @@
 package com.pbsaas.connect.web.web.backend.controller;
 
+import com.pbsaas.connect.framework.controller.BaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import springfox.documentation.annotations.ApiIgnore;
@@ -10,7 +11,7 @@ import java.util.Map;
 @ApiIgnore
 @Controller
 @RequestMapping(value="/article")
-public class ArticleController extends BaseController{
+public class ArticleController extends BaseController {
 
 	@RequestMapping("/article-list.html")
 	public  String article_list(Map<String, Object> model) {

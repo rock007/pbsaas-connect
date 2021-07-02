@@ -1,0 +1,10 @@
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile project(":connect-core")
+    compile project(":connect-protobuf")
+
+    compile 'io.netty:netty-all:4.1.9.Final'
+
+}

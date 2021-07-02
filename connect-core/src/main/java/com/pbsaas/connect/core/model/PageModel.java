@@ -8,8 +8,8 @@ public class PageModel<T> {
     private int  pageIndex;//索引
     private int totalPage;//总页数
     private int pageSize;//每页显示条数
-    private int dataCount;// 总记录数
-    private List<T> data;
+    private int count;// 总记录数
+    private List<T> list;
     // 动态显示条
     private int start = 1;
     private int end = 10;
@@ -17,16 +17,16 @@ public class PageModel<T> {
     private boolean nextPage;//是否有下一页
     private boolean prePage;//是否有上一页
 
-    public PageModel(int pageIndex, int pageSize, int dataCount) {
+    public PageModel(int pageIndex, int pageSize, int count) {
         this.pageIndex = pageIndex;
-        this.dataCount = dataCount;
+        this.count = count;
         this.pageSize = pageSize;
         int currentPage = pageIndex;
       //  this.pageIndex = (pageIndex - 1) * pageSize;
-        this.totalPage = (int) Math.ceil(dataCount * 1.0 / pageSize);
+        this.totalPage = (int) Math.ceil(count * 1.0 / pageSize);
 
         //是否可以上一页下一页
-        if (dataCount==0 || this.totalPage ==1){
+        if (count==0 || this.totalPage ==1){
             this.nextPage = false;
             this.prePage = false;
         }else if(currentPage<=1){
@@ -94,23 +94,23 @@ public class PageModel<T> {
         this.pageSize = pageSize;
     }
 
-    public int getDataCount() {
+    public int getCount() {
         if (pageSize == Integer.MAX_VALUE){
-            return data.size();
+            return list.size();
         }
-        return dataCount;
+        return count;
     }
 
-    public void setDataCount(int dataCount) {
-        this.dataCount = dataCount;
+    public void setCount(int dataCount) {
+        this.count = count;
     }
 
-    public List<T> getData() {
-        return data;
+    public List<T> getList() {
+        return list;
     }
 
-    public void setData(List<T> data) {
-        this.data = data;
+    public void setList(List<T> list) {
+        this.list = list;
     }
 
     public int getStart() {
@@ -148,7 +148,7 @@ public class PageModel<T> {
     public static Map<String,Object> renderPageInfoData(PageModel pageBean, List<Map<String,Object>> dataModel, int  currentPage){
         int totalPage = pageBean.getTotalPage();//总页数
         int pageSize = pageBean.getPageSize();//每页显示条数
-        int dataCount = pageBean.getDataCount();// 总记录数
+        int count = pageBean.getCount();// 总记录数
         boolean nextPage = pageBean.isNextPage();//是否有下一页
         boolean prePage = pageBean.isPrePage();//是否有上一页
         int start =pageBean.getStart();
@@ -157,7 +157,7 @@ public class PageModel<T> {
         data.put("pageIndex",currentPage);//不是pageBean 里面的pageIndex
         data.put("totalPage",totalPage);
         data.put("pageSize",pageSize);
-        data.put("dataCount",dataCount);
+        data.put("count",count);
         data.put("nextPage",nextPage);
         data.put("prePage",prePage);
         data.put("start",start);
@@ -176,8 +176,8 @@ public class PageModel<T> {
                 "pageIndex=" + pageIndex +
                 ", totalPage=" + totalPage +
                 ", pageSize=" + pageSize +
-                ", dataCount=" + dataCount +
-                ", data=" + data.toString() +
+                ", count=" + count +
+                ", list=" + list.toString() +
                 ", start=" + start +
                 ", end=" + end +
                 ", nextPage=" + nextPage +

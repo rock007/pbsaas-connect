@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
@@ -42,9 +43,21 @@ public class SqlDynamicExecImpl implements SqlDynamicExec {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	private Environment env;
+
 	@PostConstruct
 	public void init() {
 		try {
+
+			String dbType = env.getProperty("dao.sql.dbType", "Oracle");
+			String templateType = env.getProperty("dao.sql.template", "groovy");
+			String sqlPath = env.getProperty("dao.sql.path", "classpath:config/sql/*.xml");
+
+			// SQL语句支持工厂设置默认数据库类型
+			SqlSupportFactory.setDefaultType(dbType);
+			// SQL模板管理器初始化
+			SqlTemplateManager.init(sqlPath, templateType);
 
 		} catch (Exception e) {
 			throw new BeanInitializationException("Initialization of BaseDAO failed", e);
@@ -77,7 +90,7 @@ public class SqlDynamicExecImpl implements SqlDynamicExec {
             list = Collections.emptyList();
         }
 		PageModel<Map<String, Object>> pageBean = new PageModel<Map<String, Object>>(pageIndex,pageSize,totalCount);
-        pageBean.setData(list);
+        pageBean.setList(list);
         return pageBean;
 	    
 	}
@@ -110,7 +123,7 @@ public class SqlDynamicExecImpl implements SqlDynamicExec {
             list = Collections.emptyList();
         }
 		PageModel<T> pageBean = new PageModel<>(pageIndex,pageSize,totalCount);
-        pageBean.setData(list);
+        pageBean.setList(list);
         return pageBean;
 	}
     

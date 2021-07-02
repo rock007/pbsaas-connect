@@ -3,9 +3,8 @@ package com.pbsaas.connect.web.web.api.controller;
 import java.util.Date;
 import java.util.Map;
 
-import com.google.protobuf.Any;
-
-import com.pbsaas.connect.web.web.model.JsonBody;
+import com.pbsaas.connect.core.model.JsonBody;
+import com.pbsaas.connect.framework.controller.JsonBaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +30,7 @@ public class ChatController   extends JsonBaseController {
 	
 	@PostMapping(value="/send-msg.json")
 	public @ResponseBody
-    JsonBody<Object> send_msg(String chatType, String to, Integer msgType, String msg, String uid) {
+	JsonBody<Object> send_msg(String chatType, String to, Integer msgType, String msg, String uid) {
 /**!!
 		Connect.MsgBody  msgBody= Connect.MsgBody.newBuilder()
                 .setChatType(chatType.equals("group")? Connect.ChatType.CHAT_TYPE_GROUP: Connect.ChatType.CHAT_TYPE_FRIEND)

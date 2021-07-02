@@ -2,7 +2,7 @@ package com.pbsaas.connect.web.app.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.pbsaas.connect.web.web.model.JsonBody;
+import com.pbsaas.connect.core.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;

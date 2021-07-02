@@ -1,26 +1,48 @@
+
 spring:
   application:
     name: connect-server
   main:
-    allow-bean-definition-overriding: true  
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:mysql://localhost:3309/paintfriend?autoReconnect=true&characterEncoding=utf-8&useUnicode=true&useSSL=false&serverTimezone=GMT
+    username: root
+    password: 123456
+    driverClassName: com.mysql.cj.jdbc.Driver
 
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://129.204.161.205:20000/eureka
-  instance:
-      hostname: connect-server
-      instanceId: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}
-      preferIpAddress: true
-    
-    
+  jpa:
+    database: MYSQL
+    show-sql: true
+    properties:
+      hibernate:
+        dialect : org.hibernate.dialect.MySQL5Dialect
+
+#
+dao:
+  sql:
+    dbType: MySQL
+    template: freemarker
+    path: classpath:config/sql/*.xml
+
+
 mars:
   connect:
     port: 10013
     ip: 127.0.0.1
     fileServer: http://127.0.0.1/upload
-  hazelcast:
-    backup-count: 1
-    time-to-live-seconds: 3600
+  #hazelcast:
+  #  backup-count: 1
+  #  time-to-live-seconds: 3600
+
+#eureka:
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    serviceUrl:
+#      defaultZone: http://localhost:20000/eureka
+#  instance:
+#      hostname: connect-server
+#      instanceId: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${mars.connect.port}}
+#      preferIpAddress: true
+    
+

@@ -15,7 +15,7 @@ public final class DataBuffer {
     public ByteBuf buffer;
 
     public DataBuffer() {
-        buffer = ByteBufUtil.threadLocalDirectBuffer(); // ByteBufs.dynamicBuffer();
+        buffer = ByteBufUtil.threadLocalDirectBuffer();
     }
 
     public DataBuffer(ByteBuf binaryBuffer) {
@@ -23,7 +23,7 @@ public final class DataBuffer {
     }
 
     public DataBuffer(int length) {
-        buffer = ByteBufUtil.threadLocalDirectBuffer();// ByteBufs.buffer(length);
+        buffer = ByteBufUtil.threadLocalDirectBuffer();
         buffer.capacity(length);
     }
 

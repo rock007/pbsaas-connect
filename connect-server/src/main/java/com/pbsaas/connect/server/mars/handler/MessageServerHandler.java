@@ -1,9 +1,11 @@
 package com.pbsaas.connect.server.mars.handler;
 
+import com.pbsaas.connect.core.model.MsgHeader;
+import com.pbsaas.connect.core.model.ProtoMessage;
 import com.pbsaas.connect.proto.Connect;
 import com.pbsaas.connect.server.mars.logic.LogicManager;
-import com.pbsaas.connect.server.mars.model.MsgHeader;
-import com.pbsaas.connect.server.mars.model.ProtoMessage;
+import com.pbsaas.connect.server.mars.logic.SendMsgQueue;
+import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +37,6 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
         // ClientConnectionMap.addClientConnection(ctx);
     }
 
-    /**
-     * 每当服务端断开客户端连接时,客户端的channel从ChannelGroup中移除,并通知列表中其他客户端channel
-     * 
-     * @param ctx 连接context
-     * @throws Exception
-     */
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
 
@@ -49,68 +45,92 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
         super.handlerRemoved(ctx);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
 
-        // 暂时只支持一次接收一个完整的消息
-        // 如需要处理组合消息（长消息分多次发），需要另外处理，特别是解码逻辑
         ProtoMessage<MessageLite> message = (ProtoMessage<MessageLite>) object;
 
-        // ctx.fireChannelReadComplete();
-        MsgHeader header = message.getHeader();
-        
-        // 处理请求分发
-        switch(header.getCmdId()) {
+        try{
 
-            case Connect.CmdID.CMD_ID_UNKNOWN_VALUE:
-                logicManager.doLogin(ctx, header.getActId(), header, message.getBody());
-                break;
-            case Connect.CmdID.CMD_ID_FRIEND_VALUE:
-                //好友
+            MsgHeader header = message.getHeader();
+            //final Connect.ReqBody request = Connect.ReqBody.parseFrom(message.getBody().toByteArray());
+            //PaintFriend.ParamList paramList = request.getData().unpack(PaintFriend.ParamList.class);
 
-                break;
-            case Connect.CmdID.CMD_ID_GROUP_VALUE:
-                //群组
-                logicManager.doGroup(ctx, header.getActId(), header, message.getBody());
-                break;
-            case Connect.CmdID.CMD_ID_MSG_VALUE:
-                //消息
-                logicManager.doMessage(ctx, header.getActId(), header, message.getBody());
-                break;
-            case Connect.CmdID.CMD_ID_NOOPING_VALUE:
-                //心跳
-                break;
+            // 处理请求分发
+            switch (header.getCmdId()) {
+
+                case Connect.CmdID.CMD_LOGIN_VALUE:
+                    logicManager.doLogin(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_LOGOFF_VALUE:
+                    logicManager.doLogout(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_FRIEND_VALUE:
+                    //好友
+                    break;
+                case Connect.CmdID.CMD_GROUP_VALUE:
+                    //群组
+                    logicManager.doGroup(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_FILE_VALUE:
+                    //文件
+                    logicManager.doMessage(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_CALL_VALUE:
+                    //webrtc
+                    logicManager.doCall(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_PROFILE_VALUE:
+                    //个人信息
+                    //logicManager.doMessage(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_MSG_VALUE:
+                    //消息
+                    logicManager.doMessage(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_UNKNOWN_VALUE:
+                    //其它
+                    //logicManager.doMessage(ctx, header.getActId(), header, message.getBody());
+                    break;
+                case Connect.CmdID.CMD_NOOPING_VALUE:
+                    //心跳
+                    break;
 /**
-            case IMBaseDefine.ServiceID.SID_LOGIN_VALUE:
-                handlerManager.doLogin(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_BUDDY_LIST_VALUE:
-                handlerManager.doBuddyList(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_MSG_VALUE:
-                handlerManager.doMessage(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_GROUP_VALUE:
-                handlerManager.doGroup(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_OTHER_VALUE:
-                handlerManager.doOther(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_FILE_VALUE:
-                handlerManager.doFile(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_SWITCH_SERVICE_VALUE:
-                handlerManager.doSwitch(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            case IMBaseDefine.ServiceID.SID_AVCALL_VALUE: // for webrtc
-                handlerManager.doWebrtc(ctx, header.getCommandId(), header, message.getBody());
-                break;
-            ***/
-            default:
-                logger.warn("暂不支持的服务ID{}" , header.getServiceId());
-                break;
+ case IMBaseDefine.ServiceID.SID_LOGIN_VALUE:
+ handlerManager.doLogin(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_BUDDY_LIST_VALUE:
+ handlerManager.doBuddyList(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_MSG_VALUE:
+ handlerManager.doMessage(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_GROUP_VALUE:
+ handlerManager.doGroup(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_OTHER_VALUE:
+ handlerManager.doOther(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_FILE_VALUE:
+ handlerManager.doFile(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_SWITCH_SERVICE_VALUE:
+ handlerManager.doSwitch(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ case IMBaseDefine.ServiceID.SID_AVCALL_VALUE: // for webrtc
+ handlerManager.doWebrtc(ctx, header.getCommandId(), header, message.getBody());
+ break;
+ ***/
+                default:
+                    logger.warn("暂不支持的服务ID{}", header.getServiceId());
+                    break;
+            }
+
+        }catch (Exception ex){
+            logger.error("运行发送消息任务出错：",ex);
         }
-    
+
     }
 
     /**

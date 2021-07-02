@@ -25,7 +25,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableDiscoveryClient
 @EnableFeignClients({"com.pbsaas.connect.service"})
-@ComponentScan(basePackages ={ "com.pbsaas.connect.web","com.pbsaas.connect.service","com.pbsaas.connect.db.service"})
+@ComponentScan(basePackages ={ "com.pbsaas.connect.web","com.pbsaas.connect.service"})
 @EnableAutoConfiguration(exclude={RepositoryRestMvcAutoConfiguration.class,
 		DataSourceAutoConfiguration.class,
 		DataSourceTransactionManagerAutoConfiguration.class,

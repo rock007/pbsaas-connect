@@ -14,4 +14,5 @@ public class AppConstants {
     public static final String CON_SESSION_USER_NAME="CON_SESSION_USER_NAME";
 
     public static final String SUB_LOG_TOPIC="/connect/logs";
+    public static final String SUB_GATEWAY_LOG_TOPIC ="/connect/gateway/logs" ;
 }

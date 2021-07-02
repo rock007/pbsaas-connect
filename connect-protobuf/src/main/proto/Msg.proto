@@ -1,0 +1,31 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.pbsaas.connect.proto.msg;
+
+import "google/protobuf/any.proto";
+import "Connect.proto";
+
+message MsgBody {
+
+    ChatType chatType =1 ;
+
+    string target = 2 ;
+
+    MsgType msgType = 3;
+
+	string text = 4;
+
+	string url = 5;
+
+	string from = 6 ;
+
+	string to = 7 ;
+
+    int32 time = 8 ;
+}
+
+message ChatMessageList {
+
+    repeated MsgBody messages = 1;
+
+}

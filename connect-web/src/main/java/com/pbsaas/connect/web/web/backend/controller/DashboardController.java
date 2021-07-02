@@ -3,6 +3,7 @@ package com.pbsaas.connect.web.web.backend.controller;
 import java.util.Date;
 import java.util.Map;
 
+import com.pbsaas.connect.framework.controller.BaseController;
 import com.pbsaas.connect.service.AccountFeignService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,7 +13,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 @Controller
 @RequestMapping(value="/backend")
-public class DashboardController  extends BaseController{
+public class DashboardController  extends BaseController {
 
 	@Autowired
 	AccountFeignService accountFeignService;

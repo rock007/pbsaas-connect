@@ -6,51 +6,146 @@ import "google/protobuf/any.proto";
 
 enum CmdID {
 
-    CMD_ID_UNKNOWN = 0;
-    CMD_ID_NOOPING = 6;
-    CMD_ID_PUSH = 10001;
+    CMD_UNKNOWN = 0x0000;
+    CMD_NOOPING = 0x0001;
 
-    CMD_ID_FRIEND = 1;
-    CMD_ID_GROUP = 2;
-    CMD_ID_MSG = 3;
+    CMD_LOGIN = 0x0002;
+    CMD_LOGOFF = 0x0003;
+
+    CMD_FRIEND = 0x0004;
+    CMD_GROUP = 0x0005;
+    CMD_MSG = 0x0006;
+    CMD_FILE = 0x0007;
+    CMD_CALL = 0x0008;
+    CMD_PROFILE=0X0009;
+}
+
+enum ActID {
+
+    ACT_UNKNOWN = 0x0000;
+
+    ACT_LOGIN_REQ = 0x0201;
+    ACT_LOGIN_RSP = 0x0202;
+
+    ACT_LOGOFF_REQ = 0x0301;
+    ACT_LOGOFF_RSP = 0x0302;
+
+    //friend
+    ACT_FRIEND_ADD_REQ = 0x0401;
+    ACT_FRIEND_ADD_RSP = 0x0402;
+
+    ACT_FRIEND_ACCEPT_REQ = 0x0403;
+    ACT_FRIEND_ACCEPT_RSP = 0x0404;
+
+    ACT_FRIEND_REMOVE_REQ = 0x0405;
+    ACT_FRIEND_REMOVE_RSP = 0x0406;
+
+    ACT_FRIEND_VIEW_REQ = 0x0407;
+    ACT_FRIEND_VIEW_RSP = 0x0408;
+
+    ACT_FRIEND_SEARCH_REQ = 0x0409;
+    ACT_FRIEND_SEARCH_RSP = 0x040a;
+
+    ACT_FRIEND_MARK_REQ = 0x040b;
+    ACT_FRIEND_MARK_RSP = 0x040c;
+
+    //group
+    ACT_GROUP_SEARCH_REQ = 0x0501;
+    ACT_GROUP_SEARCH_RSP = 0x0502;
+
+    ACT_GROUP_ADD_REQ = 0x0503;
+    ACT_GROUP_ADD_RSP = 0x0504;
+
+    ACT_GROUP_ACCEPT_REQ = 0x0505;
+    ACT_GROUP_ACCEPT_RSP = 0x0506;
+
+    ACT_GROUP_QUIT_REQ = 0x0507;
+    ACT_GROUP_QUIT_RSP = 0x0508;
+
+    ACT_GROUP_RELEASE_REQ = 0x0509;
+    ACT_GROUP_RELEASE_RSP = 0x050a;
+
+    ACT_GROUP_PROFILE_REQ = 0x050b;
+    ACT_GROUP_PROFILE_RSP = 0x050c;
+
+    ACT_GROUP_MEMBER_REQ = 0x050d;
+    ACT_GROUP_MEMBER_RSP = 0x050e;
+
+    //msg
+    ACT_MSG_SEND_REQ = 0x0601;
+    ACT_MSG_SEND_RSP = 0x0602;
+
+    ACT_MSG_READ_REQ = 0x0603;
+    ACT_MSG_READ_RSP = 0x0604;
+
+    ACT_MSG_SEARCH_REQ = 0x0605;
+    ACT_MSG_SEARCH_RSP = 0x0606;
+
+    ACT_MSG_GET_REQ = 0x0607;
+    ACT_MSG_GET_RSP = 0x0608;
+
+    //file
+    ACT_FILE_SEND_REQ = 0x0701;
+    ACT_FILE_SEND_RSP = 0x0702;
+
+    ACT_FILE_GET_REQ = 0x0703;
+    ACT_FILE_GET_RSP = 0x0704;
+
+    ACT_FILE_REMOVE_REQ = 0x0705;
+    ACT_FILE_REMOVE_RSP = 0x0706;
+
+    //call
+    ACT_CALL_NONE                          = 0x0800;
+
+    ACT_CALL_INITIATE_REQ                  = 0x0801;
+    ACT_CALL_INITIATE_Rsp                  = 0x0802;
+
+    ACT_CALL_HUNGUP_REQ                    = 0x0803;
+    ACT_CALL_HUNGUP_Rsp                    = 0x0804;
+
+    ACT_CALL_CANCEL_REQ                    = 0x0805;
+    ACT_CALL_CANCEL_Rsp                    = 0x0806;
+
+    //profile
+    ACT_PROFILE_UPDATE_REQ = 0x0901;
+    ACT_PROFILE_UPDATE_RSP = 0x0902;
+
+    ACT_PROFILE_GET_REQ = 0x0903;
+    ACT_PROFILE_GET_RSP = 0x0904;
+
+    ACT_PROFILE_AVATAR_REQ = 0x0905;
+    ACT_PROFILE_AVATAR_RSP = 0x0906;
+
+    ACT_PROFILE_STATE_REQ = 0x0907;
+    ACT_PROFILE_STATE_RSP = 0x0908;
+
 }
 
 enum ClientType{
-
-    CLIENTTYPE_WINDOWS=0;
-    CLIENTTYPE_MAC=1;
-    CLIENTTYPE_ANDROID=2;
-    CLIENTTYPE_IOS=3;
-    CLIENTTYPE_WEB=4;
+    CLIENT_TYPE_WINDOWS=0;
+    CLIENT_TYPE_MAC=1;
+    CLIENT_TYPE_ANDROID=2;
+    CLIENT_TYPE_IOS=3;
+    CLIENT_TYPE_WEB=4;
 }
 
 enum StateType{
+
     STATE_UNKNOW=0;
     STATE_ONLINE=1;
     STATE_OFFLINE=2;
     STATE_LEVEL=3;
 }
 
-enum ActID {
-
-    ACT_ID_UNKNOWN = 0;
-    ACT_ID_LOGIN = 1;
-    ACT_ID_LOGOUT = 2;
-
-    ACT_ID_SEND_MSG = 3;
-    ACT_ID_OFFLINE_MSGS = 4;
-
-    ACT_ID_NOTICE_RSP = 5;
-}
-
 enum MsgType {
-        MSG_TYPE_TEXT = 0;
-        MSG_TYPE_IMAGE = 1;
-        MSG_TYPE_SOUND = 2;
-        MSG_TYPE_VIDEO = 3;
-        MSG_TYPE_HTML = 4;
-        MSG_TYPE_LINK = 5;
-        MSG_TYPE_UNKNOWN = 6;
+
+    MSG_TYPE_TEXT = 0;
+    MSG_TYPE_IMAGE = 1;
+    MSG_TYPE_SOUND = 2;
+    MSG_TYPE_VIDEO = 3;
+    MSG_TYPE_HTML = 4;
+    MSG_TYPE_LINK = 5;
+    MSG_TYPE_UNKNOWN = 6;
 }
 
 enum ChatType {
@@ -60,50 +155,21 @@ enum ChatType {
 
 message RespBody {
 
-     CmdID cmdid = 1;
-     
-     int32 result = 2;
-     string msg = 3;
+     int32 result = 1;
+     string msg = 2;
   
-  	 google.protobuf.Any data = 4;
+  	 google.protobuf.Any data = 3;
+     //bytes body = 4;
 }
 
 
 message ReqBody {
 
     CmdID cmdid = 1;
-	
-	string uid = 2;
 
-	string token = 3;
-	
-	google.protobuf.Any data = 4;
+    ActID actid=2;
 
-}
-
-message MsgBody {
-
-    ChatType chatType =1 ;
-
-    string target = 2 ;
-
-    MsgType msgType = 3;
-
-	string text = 4;
-
-	string url = 5;
-
-	string from = 6 ;
-
-	string to = 7 ;
-
-    int32 time = 8 ;
-}
-
-message ChatMessageList {
-
-    repeated MsgBody messages = 1;
-
+	google.protobuf.Any data = 3;
 }
 
 message Param{

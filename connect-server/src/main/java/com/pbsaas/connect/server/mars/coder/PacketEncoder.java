@@ -2,8 +2,8 @@ package com.pbsaas.connect.server.mars.coder;
 
 import java.util.Arrays;
 
-import com.pbsaas.connect.server.mars.model.MsgHeader;
-import com.pbsaas.connect.server.mars.model.ProtoMessage;
+import com.pbsaas.connect.core.model.MsgHeader;
+import com.pbsaas.connect.core.model.ProtoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public final class PacketEncoder extends MessageToByteEncoder<ProtoMessage<Messa
             // Set the length of bytebuf
             header.setLength(MsgHeader.FIXED_HEADER_SKIP + length);
             
-            byte[] allbytes = header.encode().array();
+            byte[] allbytes = DataBufferCoder.encode(header).array();
             allbytes = Arrays.copyOf(allbytes, MsgHeader.FIXED_HEADER_SKIP + length);
             
             for (int i = 0; i < length; i++) {

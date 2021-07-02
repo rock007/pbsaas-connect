@@ -3,10 +3,10 @@ package com.pbsaas.connect.web.web.front.controller;
 import java.util.Date;
 import java.util.Map;
 
+import com.pbsaas.connect.core.model.JsonBody;
+import com.pbsaas.connect.framework.controller.BaseController;
 import com.pbsaas.connect.model.vo.AccountVO;
 import com.pbsaas.connect.service.AccountFeignService;
-import com.pbsaas.connect.web.web.backend.controller.BaseController;
-import com.pbsaas.connect.web.web.model.JsonBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +24,7 @@ public class HomeController  extends BaseController {
 	@RequestMapping("/")
 	public  String index(Map<String, Object> model) {
 
-		AccountVO ooo= accountFeignService.findByName("aaaaa");
+		JsonBody<AccountVO> ooo= accountFeignService.findByName("admin");
 
 		model.put("time", new Date());
 		model.put("message", "hello the world");

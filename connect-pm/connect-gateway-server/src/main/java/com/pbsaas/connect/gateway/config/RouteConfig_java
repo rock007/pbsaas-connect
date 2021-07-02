@@ -1,0 +1,90 @@
+/**
+* sam@here 2019年10月21日
+**/
+package org.wenzhou.gateway.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import reactor.core.publisher.Mono;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.RequestPredicates;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import ReqTimeCheckConfig;
+import ReqTimeCheckGateWayFilterFactory;
+import ThrottleGatewayFilter;
+
+//!!@Configuration
+public class RouteConfig {
+
+	String uri="http://localhost:10001";
+	 
+	@Bean
+    public ReqTimeCheckGateWayFilterFactory reqTimeCheckGateWayFilterFactory() {
+        return new ReqTimeCheckGateWayFilterFactory();
+    }
+	
+	@Bean
+	public RouteLocator customRouteLocator(RouteLocatorBuilder builder/**,TokenRelayGatewayFilterFactory filterFactory**/) {
+		
+		return builder.routes()
+				.route(r -> r.path("/rest/**")
+					.filters(f ->f//.rewritePath("/rest/(?<segment>.*)", "/$\\{segment}")//
+							//.filter(reqTimeCheckFilterFactory.apply())
+							//.setPath("{segment}") not work
+							.filter(reqTimeCheckGateWayFilterFactory().apply(new ReqTimeCheckConfig(false) ))
+							.stripPrefix(1)/*返回上一级
+							.addRequestHeader("X-TestHeader", "foobar")
+							.addRequestParameter("parm1", "fuckyou1")
+							.addResponseHeader("aa", "bbb")
+							.setRequestHeader("hh", "hhh2")
+							.modifyRequestBody(String.class, String.class, MediaType.APPLICATION_JSON_VALUE, 
+									(exchange, s) ->  Mono.just(s.toUpperCase()+"44444444444444444")
+									)
+							.modifyResponseBody(String.class, String.class, MediaType.APPLICATION_JSON_VALUE, 
+									(exchange, s) ->  Mono.just(s.toUpperCase()+"55555555")
+									)
+							**/
+							)
+					.uri(uri)//"lb://DRUGMAN_SERVICE"
+					.id("drugan_server")
+				)
+				.build();
+		
+	}
+
+	@Bean
+	public RouterFunction<ServerResponse> testFunRouterFunction() {
+		RouterFunction<ServerResponse> route = RouterFunctions.route(
+				RequestPredicates.path("/testfun"),
+				request -> ServerResponse.ok().body(BodyInserters.fromObject("hello")));
+		return route;
+	}
+
+	@Bean
+	public RouterFunction<ServerResponse> testWhenMetricPathIsNotMeet() {
+		RouterFunction<ServerResponse> route = RouterFunctions.route(
+				RequestPredicates.path("/actuator/metrics/gateway.requests"),
+				request -> ServerResponse.ok().body(BodyInserters
+						.fromObject("fuck the world")));
+		return route;
+	}
+
+}
+
+

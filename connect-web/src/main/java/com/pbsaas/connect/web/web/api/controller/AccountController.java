@@ -11,7 +11,8 @@ import javax.servlet.http.HttpSession;
 
 import com.pbsaas.connect.core.AppConstants;
 
-import com.pbsaas.connect.web.web.model.JsonBody;
+import com.pbsaas.connect.core.model.JsonBody;
+import com.pbsaas.connect.framework.controller.JsonBaseController;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.util.StringUtils;
 
 import com.pbsaas.connect.web.utils.StringHelper;
@@ -39,7 +39,7 @@ import com.pbsaas.connect.web.utils.StringHelper;
 @Controller
 @CrossOrigin( maxAge = 3600)
 @RequestMapping(value="/api")
-public class AccountController extends JsonBaseController{
+public class AccountController extends JsonBaseController {
 
 	//@Autowired
 	//private RestTemplate restTemplate;

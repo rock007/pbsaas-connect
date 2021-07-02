@@ -6,10 +6,9 @@ package com.pbsaas.connect.server.mars.coder;
 
 import java.util.List;
 
-import com.pbsaas.connect.proto.Connect;
+import com.pbsaas.connect.core.model.MsgHeader;
+import com.pbsaas.connect.core.model.ProtoMessage;
 import com.pbsaas.connect.server.mars.connect.ProtobufParseMap;
-import com.pbsaas.connect.server.mars.model.MsgHeader;
-import com.pbsaas.connect.server.mars.model.ProtoMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +43,8 @@ public class PacketWsFrameDecoder extends MessageToMessageDecoder<WebSocketFrame
 
             DataBuffer dataBuf = new DataBuffer(in);
 
-            MsgHeader header = new MsgHeader();
-            if( !header.decode(dataBuf)){
+            MsgHeader header = DataBufferCoder.decode(dataBuf);
+            if(header==null){
 
                 ctx.close();
                 logger.error("message length less than 0, channel closed");
@@ -67,11 +66,11 @@ public class PacketWsFrameDecoder extends MessageToMessageDecoder<WebSocketFrame
 
             ProtoMessage<MessageLite> protoMessage = new ProtoMessage<>(header, content);
             out.add(protoMessage);
-
+/**
             final Connect.ReqBody request = Connect.ReqBody.parseFrom(header.getBody());
 
             out.add(request);
-
+***/
             logger.debug("Received protobuf : length={}, commandId={}", header.getLength(), header.getCmdId());
         } catch (Exception e) {
             logger.error(ctx.channel().remoteAddress() + ",decode failed.", e);

@@ -1,6 +1,8 @@
 package com.pbsaas.connect.model.vo;
 
-public class AccountVO {
+import java.io.Serializable;
+
+public class AccountVO implements Serializable {
 
     private  String uid;
 

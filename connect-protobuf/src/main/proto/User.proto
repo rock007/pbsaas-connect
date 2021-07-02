@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+//option optimize_for = LITE_RUNTIME;
+
+package com.pbsaas.connect.proto.user;
+
+import "google/protobuf/any.proto";
+
+message User{
+
+    int32 id=1;
+
+    string name=2;
+
+    int32 sex=3;
+
+    string domain=4;
+
+    string nick=5;
+
+    string password=6;
+
+    string salt=7;
+
+    string phone=8;
+
+    string email=9;
+
+    int32 departid=10;
+
+    string avatar=11;
+
+    int32 status=12;
+
+    int32 created=13;
+
+    int32 updated=14;
+
+    int32 push_shield_status=15;
+
+    string sign_info=16;
+}
+
+message LoginReq {
+
+    string token=1;
+}
+
+message LoginRsp {
+
+    int32 result=1;
+
+    string msg=2;
+}
+
+message LogoutReq {
+
+    string token=1;
+}
+
+message LogoutRsp {
+
+    int32 result=1;
+
+    string msg=2;
+}
+
+service UserService{
+
+    rpc login(LoginReq) returns (LoginRsp);
+    rpc addUser(User) returns (User);
+
+    rpc modifyUser(User) returns (User);
+}

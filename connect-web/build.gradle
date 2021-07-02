@@ -8,18 +8,18 @@ bootJar {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile project(":connect-core")
+    compile project(":connect-framework")
     compile project(":connect-interface")
     compile project(":connect-protobuf")
 
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-redis")
 
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-websocket")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-jersey")
-
-    compile("org.springframework.boot:spring-boot-starter-data-redis")
 
     compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     compile("org.springframework.cloud:spring-cloud-starter-openfeign")

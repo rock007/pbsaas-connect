@@ -3,9 +3,8 @@
  **/
 package com.pbsaas.connect.server.mars;
 
-
-import com.pbsaas.connect.server.app.config.MarsConfig;
-import com.pbsaas.connect.server.mars.cluster.MessageServerCluster;
+import com.pbsaas.connect.proto.Connect;
+import com.pbsaas.connect.server.config.MarsConfig;
 import com.pbsaas.connect.server.mars.connect.ProtobufParseMap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +27,7 @@ import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@Component
+//@Component
 public class MarsConnectServer  implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(MarsConnectServer.class);
@@ -37,23 +35,14 @@ public class MarsConnectServer  implements CommandLineRunner {
     private ServerBootstrap serverBootstrap;
     private ChannelFuture future;
 
+    private ContextTimeoutChecker checker;
+
     @Autowired
     @Qualifier("unifiedChannelInitializer")
     private ChannelInitializer<SocketChannel> channelInboundHandler;
 
     @Autowired
-    private Registration registration;
-    @Autowired
     private MarsConfig marsConfig;
-    @Autowired
-    private MessageServerCluster messageServerCluster;
-
-    //外网IP
-    private String ipadress;
-    private String priorIP;
-    private int port;
-
-    private  boolean started=false;
 
     /**
      *
@@ -71,6 +60,11 @@ public class MarsConnectServer  implements CommandLineRunner {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
+
+            checker = new ContextTimeoutChecker();
+            Timer timer = new Timer();
+            timer.schedule(checker, 15 * 60 * 1000, 15 * 60 * 1000);
+
             InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.getDefaultFactory());
 
             serverBootstrap = new ServerBootstrap();
@@ -81,23 +75,14 @@ public class MarsConnectServer  implements CommandLineRunner {
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
 
-
-            // 绑定端口,开始接收进来的连接
-            String registHost = registration.getHost();
-            future = serverBootstrap.bind(registHost, marsConfig.getPort()).sync();
+            future = serverBootstrap.bind(marsConfig.getPort()).sync();
 
             // 获取绑定的端口号
             if (future.channel().localAddress() instanceof InetSocketAddress) {
                 InetSocketAddress socketAddress = (InetSocketAddress)future.channel().localAddress();
-                this.priorIP = marsConfig.getIp();
-                this.ipadress = socketAddress.getAddress().getHostAddress();
-                this.port = socketAddress.getPort();
-                this.started = true;
-                logger.info("NettyChatServer 启动了，address={}:{}", socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
-            }
 
-            // messageServerCluster
-            messageServerCluster.registLocal(this);
+                logger.info("MarsServer 启动了，address={}:{}", socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
+            }
 
             // 等待服务器socket关闭
             future.channel().closeFuture().sync();
@@ -112,13 +97,18 @@ public class MarsConnectServer  implements CommandLineRunner {
     }
 
     private void initProtobuf() {
-
+/**
         ProtobufParseMap.register(ServiceID.SID_GROUP_VALUE, GroupCmdID.CID_GROUP_NORMAL_LIST_REQUEST_VALUE,
                 IMGroup.IMNormalGroupListReq::parseFrom, IMGroup.IMNormalGroupListReq.class);
+
         ProtobufParseMap.register(ServiceID.SID_GROUP_VALUE, GroupCmdID.CID_GROUP_INFO_REQUEST_VALUE,
                 IMGroup.IMGroupInfoListReq::parseFrom, IMGroup.IMGroupInfoListReq.class);
 
+        ProtobufParseMap.register(Connect.CmdID.CMD_ID_UNKNOWN_VALUE, Connect.ActID.ACT_ID_LOGIN_VALUE,
+               Connect.ReqBody::parseFrom, Connect.ReqBody.class);
+***/
     }
+
     @PreDestroy
     public void shutdown() {
 
@@ -129,34 +119,25 @@ public class MarsConnectServer  implements CommandLineRunner {
             }
         }
         logger.debug("MarsServer  shutdown");
-
     }
 
-    public String getIpadress() {
-        return ipadress;
-    }
+    public class ContextTimeoutChecker extends TimerTask {
 
-    public void setIpadress(String ipadress) {
-        this.ipadress = ipadress;
-    }
+        @Override
+        public void run() {
 
-    public String getPriorIP() {
-        return priorIP;
-    }
+            //logger.info(LogUtils.format("check longlink alive per 15 minutes, " + this));
 
-    public void setPriorIP(String priorIP) {
-        this.priorIP = priorIP;
-    }
+            /**
+            for (ConnInfo conn : SessionPool.getAll().values()) {
+                if (System.currentTimeMillis() - conn.getRefreshTime() > 15 * 60 * 1000) {
 
-    public int getPort() {
-        return port;
-    }
+                    SessionPool.remove(conn.getChannel());
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public boolean isStarted() {
-        return started;
+                    //logger.info(LogUtils.format("%s expired, deleted.", conn.toString()));
+                }
+            }
+            ***/
+        }
     }
 }

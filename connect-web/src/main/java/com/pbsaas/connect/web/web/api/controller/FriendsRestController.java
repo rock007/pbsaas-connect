@@ -1,16 +1,8 @@
 package com.pbsaas.connect.web.web.api.controller;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import com.pbsaas.connect.proto.Connect;
-import com.pbsaas.connect.web.web.model.JsonBody;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pbsaas.connect.framework.controller.JsonBaseController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.util.StringUtils;
 
 /**
  * @author sam
@@ -19,7 +11,7 @@ import org.thymeleaf.util.StringUtils;
 @Controller
 @CrossOrigin
 @RequestMapping(value="/api")
-public class FriendsRestController  extends JsonBaseController{
+public class FriendsRestController  extends JsonBaseController {
 
 	/**
 	@Autowired

@@ -4,10 +4,10 @@
 package com.pbsaas.connect.server.mars.logic;
 
 import com.google.protobuf.MessageLite;
+import com.pbsaas.connect.core.model.MsgHeader;
 import com.pbsaas.connect.proto.Connect;
-import com.pbsaas.connect.server.mars.cluster.MessageServerCluster;
 import com.pbsaas.connect.server.mars.logic.action.UserAction;
-import com.pbsaas.connect.server.mars.model.MsgHeader;
+
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +19,8 @@ public class LogicManager {
 
     private static final Logger logger = LoggerFactory.getLogger(LogicManager.class);
 
-    @Autowired
-    private MessageServerCluster messageServerCluster;
+    //@Autowired
+    //private MessageServerCluster messageServerCluster;
 
     @Autowired
     private UserAction userAction;
@@ -38,14 +38,14 @@ public class LogicManager {
         }
 
         // routerHandler.sendUserStatusUpdate(ctx, UserStatType.USER_STATUS_OFFLINE);
-        messageServerCluster.userStatusUpdate(userId, ctx, Connect.StateType.STATE_OFFLINE);
+        //messageServerCluster.userStatusUpdate(userId, ctx, Connect.StateType.STATE_OFFLINE);
 
-        ClientUser clientUser = ClientsManager.getUserById(userId);
+        ClientUser clientUser = ClientUserManager.getUserById(userId);
         if (clientUser != null) {
             clientUser.unValidateMsgConn(handleId, ctx);
 
             if (clientUser.isConnEmpty()) {
-                ClientsManager.removeUser(clientUser);
+                ClientUserManager.removeUser(clientUser);
             }
         }
     }
@@ -65,10 +65,10 @@ public class LogicManager {
             return;
         }
 
-        // routerHandler.sendUserStatusUpdate(ctx, UserStatType.USER_STATUS_OFFLINE);
-        messageServerCluster.userStatusUpdate(userId, ctx, Connect.StateType.STATE_OFFLINE);
+         //routerHandler.sendUserStatusUpdate(ctx, UserStatType.USER_STATUS_OFFLINE);
+        //messageServerCluster.userStatusUpdate(userId, ctx, Connect.StateType.STATE_OFFLINE);
 
-        ClientUser clientUser = ClientsManager.getUserById(userId);
+        ClientUser clientUser = ClientUserManager.getUserById(userId);
         if (clientUser != null) {
             clientUser.unValidateMsgConn(handleId, ctx);
         }
@@ -80,8 +80,8 @@ public class LogicManager {
      */
     public void online(ChannelHandlerContext ctx) {
 
-        Long handleId = ctx.attr(ClientUser.HANDLE_ID).get();
-        Long userId = ctx.attr(ClientUser.USER_ID).get();
+        Long handleId = ctx.channel().attr(ClientUser.HANDLE_ID).get();
+        Long userId = ctx.channel().attr(ClientUser.USER_ID).get();
 
         if (handleId != null) {
             // 关闭
@@ -91,9 +91,9 @@ public class LogicManager {
         }
 
         // routerHandler.sendUserStatusUpdate(ctx, UserStatType.USER_STATUS_ONLINE);
-        messageServerCluster.userStatusUpdate(userId, ctx, Connect.StateType.STATE_ONLINE);
+        //messageServerCluster.userStatusUpdate(userId, ctx, Connect.StateType.STATE_ONLINE);
 
-        ClientUser clientUser = ClientsManager.getUserById(userId);
+        ClientUser clientUser = ClientUserManager.getUserById(userId);
         if (clientUser != null) {
             clientUser.validateMsgConn(handleId, ctx);
         }
@@ -112,48 +112,82 @@ public class LogicManager {
 
     public void doGroup(ChannelHandlerContext ctx, int actId, MsgHeader header, MessageLite body) {
 
+        logger.debug("doGroup commandId: {}", actId);
+
+        switch (actId) {
+            case Connect.ActID.ACT_GROUP_ACCEPT_REQ_VALUE:
+                //userAction.login(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_GROUP_SEARCH_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_GROUP_QUIT_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_GROUP_RELEASE_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_GROUP_PROFILE_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_GROUP_MEMBER_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_GROUP_ADD_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            default:
+                logger.warn("Unsupport command id {}", actId);
+                break;
+        }
     }
 
     public void doMessage(ChannelHandlerContext ctx, int actId, MsgHeader header, MessageLite body) {
 
+        switch (actId) {
+            case Connect.ActID.ACT_MSG_GET_REQ_VALUE:
+                //userAction.login(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_MSG_READ_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_MSG_SEARCH_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_MSG_SEND_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            default:
+                logger.warn("Unsupport command id {}", actId);
+                break;
+        }
+    }
+
+    public void doCall(ChannelHandlerContext ctx, int actId, MsgHeader header, MessageLite body) {
+
+        switch (actId) {
+            case Connect.ActID.ACT_CALL_CANCEL_REQ_VALUE:
+                //userAction.login(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_CALL_HUNGUP_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            case Connect.ActID.ACT_CALL_INITIATE_REQ_VALUE:
+                //userAction.logOut(header, body, ctx);
+                break;
+            default:
+                logger.warn("Unsupport command id {}", actId);
+                break;
+        }
     }
 
     public void doLogin(ChannelHandlerContext ctx, int actId, MsgHeader header, MessageLite body) throws Exception {
 
-        logger.debug("doLogin commandId: {}", actId);
-
         userAction.login(header, body, ctx);
-        /**
-        switch (commandId) {
-            case LoginCmdID.CID_LOGIN_REQ_MSGSERVER_VALUE:
-                // this was do at login_server
-                logger.warn("this was do at login_server: commandId={}", commandId);
-                break;
-            case LoginCmdID.CID_LOGIN_REQ_USERLOGIN_VALUE:
-                userAction.login(header, body, ctx);
-                break;
-            case LoginCmdID.CID_LOGIN_REQ_LOGINOUT_VALUE:
-                imLoginHandler.logOut(header, body, ctx);
-                break;
-            case LoginCmdID.CID_LOGIN_KICK_USER_VALUE:
-                imLoginHandler.kickUser(header, body, ctx);
-                break;
-            case LoginCmdID.CID_LOGIN_REQ_DEVICETOKEN_VALUE:
-                imLoginHandler.deviceToken(header, body, ctx);
-                break;
-            case LoginCmdID.CID_LOGIN_REQ_KICKPCCLIENT_VALUE:
-                imLoginHandler.kickPcClient(header, body, ctx);
-                break;
-            case LoginCmdID.CID_LOGIN_REQ_PUSH_SHIELD_VALUE:
-                imLoginHandler.pushShield(header, body, ctx);
-                break;
-            case LoginCmdID.CID_LOGIN_REQ_QUERY_PUSH_SHIELD_VALUE:
-                imLoginHandler.queryPushShield(header, body, ctx);
-                break;
-            default:
-                logger.warn("Unsupport command id {}", commandId);
-                break;
-        }
-        ***/
+    }
+
+    public void doLogout(ChannelHandlerContext ctx, int actId, MsgHeader header, MessageLite body) throws Exception {
+
+        userAction.logOut(header, body, ctx);
     }
 }

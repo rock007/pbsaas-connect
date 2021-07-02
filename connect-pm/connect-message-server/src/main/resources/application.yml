@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: connect-message-server
+  main:
+    allow-bean-definition-overriding: true  
+
+mars:
+  connect:
+    port: 10013
+    ip: 127.0.0.1
+    fileServer: http://127.0.0.1/upload
+  hazelcast:
+    backup-count: 1
+    time-to-live-seconds: 3600
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:20000/eureka
+  instance:
+      hostname: connect-server
+      instanceId: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${mars.connect.port}}
+      preferIpAddress: true
+    
+

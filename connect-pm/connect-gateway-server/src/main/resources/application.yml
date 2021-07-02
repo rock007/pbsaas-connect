@@ -1,0 +1,175 @@
+debug: true
+
+http:
+  port: 10000
+  
+server:
+  port: 443
+ 
+  ssl:
+    enabled: true
+    key-store-password: 2H8Fu7S6
+    key-store: classpath:4257930__zenith-bio.com.pfx
+    key-store-type: PKCS12
+  undertow:
+    worker-threads: 1000
+    
+spring:
+  jmx:
+    enabled: false
+  application:
+    name: connect-gateway
+  mvc:
+    favicon:
+      enabled: false
+  main:
+    allow-bean-definition-overriding: true 
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 
+    lettuce:
+      shutdown-timeout: 2000ms
+      pool:
+        max-idle: 50
+        min-idle: 3
+        max-active: 800
+        max-wait: 100000
+           
+  cloud:
+    gateway:
+      httpclient:  
+        connect-timeout: 20000
+        response-timeout: 30000      
+        ssl:          
+          useInsecureTrustManager: true
+          
+      discovery:
+        locator:
+         enabled: true
+      
+      routes:
+       - id: system_server
+         uri: lb://system-service
+         predicates:
+           - Path=/system/**
+         filters:
+         - StripPrefix=1
+       - id: druman_server
+         uri: lb://drugman-service
+         order: 10000
+         predicates:
+           - Path=/rest/**
+         filters:
+         - StripPrefix=1
+       - id: wushui-service
+         uri: lb://wushui-service
+         predicates:
+         - Path=/wushui/**  
+         filters:
+          - StripPrefix=1  
+       - id: drugan_workflow
+         uri: lb://drugman-workflow
+         predicates:
+         - Path=/wf/**  
+         filters:
+          - StripPrefix=1
+       - id: drugan_web
+         uri: lb://drugman-web
+         predicates:
+         - Path=/web/**    
+         filters:
+          - name: RequestSize
+            args:
+              maxSize: 5000000
+          - StripPrefix=1
+       
+       - id: websocket_sockjs_route
+         uri: ws://127.0.0.1:1883
+         predicates:
+          - Path=/connect/**
+         filters:
+          - StripPrefix=1
+          - AddRequestHeader=Upgrade,websocket  
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:20000/eureka
+  instance:
+    hostname: connect-gateway
+    instanceId: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${mars.connect.port}}
+    preferIpAddress: true
+
+
+# 配置日志级别
+logging:
+  path: d:\\temp\\logs
+  file: connect_gateway.log
+  level:
+    root: WARN
+    org.springframework.cloud.gateway: debug
+    org.drugman.gateway: info  
+      
+management.endpoints.web.exposure.include: '*'  
+        
+system-service:
+  ribbon:
+    listOfServers: http://localhost:10003    
+drugman-service:
+  ribbon:
+    listOfServers: http://localhost:10001,http://localhost:10031
+drugman-web:
+  ribbon:
+    listOfServers: http://localhost:10007    
+drugman-workflow:
+  ribbon:
+    listOfServers: http://localhost:10002
+wushui-service:
+  ribbon:
+    listOfServers: http://localhost:10012 
+    
+reactor:
+    netty:
+        worker-count: 1
+
+ignore:
+  urls:
+    - /authentication/**
+    - favicon.ico
+    - /err
+    - /connect/
+    - /wf/getProcessExecImage
+    - /web/logout
+    - /web/app/
+    - /web/images/
+    - /web/css/
+    - /web/user-notice/
+    - /web/notice-tpl/
+    - /web/oauth/token
+    - /rest/drugman/regist
+    - /web/rest/file/upload
+    - /web/upload/
+    - /web/api
+    - /web/report/
+    - /web/office/
+    - /web/doLogin
+    - /rest/get-hosts
+    - /rest/cms/article-search
+    - /rest/cms/article-get
+    - /rest/cms/getArticeCateTree
+    - /rest/getAreaTree
+    - /rest/getCategroryTree
+    - /system/getDict
+    - /system/sysetting-search
+    - /rest/jdinterface/
+    - /web/media/
+    - /rest/druid/
+    - /wushui/v2/
+    - /system/v2/
+    
+  excludes:
+  clients:
+    - abc

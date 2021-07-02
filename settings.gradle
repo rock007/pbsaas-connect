@@ -16,14 +16,22 @@ include 'services:webservice'
 */
 
 rootProject.name = 'pbsaas_connect'
+include 'connect-core'
+include 'connect-framework'
+
+include 'connect-db'
+include 'connect-protobuf'
+
 include 'connect-interface'
 include 'connect-provider'
-include 'connect-db'
-include 'connect-server'
-include 'connect-protobuf'
+
 include 'connect-web'
-include 'connect-core'
-include 'connect-turn'
-include 'eureka-server'
-include 'connect-framework'
+include 'connect-server'
+include 'connect-try-test'
+
+include 'connect-pm:connect-turn-server'
+include 'connect-pm:connect-eureka-server'
+include 'connect-pm:connect-gateway-server'
+include 'connect-pm:connect-message-server'
+
 

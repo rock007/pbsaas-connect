@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface AccountRepository extends JpaRepository<Account, String> ,JpaSpecificationExecutor<Account>{
 	
-	Account findByName(String username);
+	Account findByUserName(String username);
 	
 	Account findByMobile(String mobile);
 	
@@ -16,4 +16,8 @@ public interface AccountRepository extends JpaRepository<Account, String> ,JpaSp
 	Account findByQqOpenid(String open_id);
 	
 	Account findByWbOpenid(String open_id);
+
+	int countByMobile(String mobile);
+
+	int countByUserName(String userName);
 }

@@ -1,0 +1,148 @@
+package com.pbsaas.connect.server.mars.handler;
+
+import com.pbsaas.connect.core.model.MsgHeader;
+import com.pbsaas.connect.core.model.ProtoMessage;
+import com.pbsaas.connect.proto.Connect;
+import com.pbsaas.connect.server.mars.logic.LogicManager;
+import com.pbsaas.connect.server.mars.logic.SendMsgQueue;
+import io.netty.util.ReferenceCountUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.MessageLite;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+
+/**
+ * 消息处理
+ */
+public class MessageServerHandler extends ChannelInboundHandlerAdapter {
+
+    private Logger logger = LoggerFactory.getLogger(MessageServerHandler.class);
+
+    private final LogicManager logicManager;
+
+    public MessageServerHandler(LogicManager logicManager) {
+        super();
+        this.logicManager = logicManager;
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        super.handlerAdded(ctx);
+        logger.debug("channel#handlerAdded");
+        // 保存客户端连接
+        // ClientConnectionMap.addClientConnection(ctx);
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+
+        logger.debug("channel#handlerRemoved");
+        logicManager.remove(ctx);
+        super.handlerRemoved(ctx);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
+
+        Connect.RespBody response;
+
+        try {
+
+            /***
+             final InputStream socketInput = new ByteBufInputStream((ByteBuf) msg);
+
+             MessageHolder holder=new MessageHolder();
+
+             boolean ret = holder.decode(socketInput);
+             IOUtils.closeQuietly(socketInput);
+
+             if(!ret) {
+
+             return;
+             }
+             ****/
+            ProtoMessage<MessageLite> message = (ProtoMessage<MessageLite>) object;
+
+            SendMsgQueue.getQueue().add(message);
+
+            //直接加入栈
+            if (!SendMsgQueue.getQueue().offer(message)) {
+
+                logger.warn("add sendMsgQueue fail");
+                return;
+            }
+            logger.info("服务器回复：ok");
+
+            response = Connect.RespBody.newBuilder()
+                    .setResult(1)
+                    .setMsg("ok")
+                    .build();
+
+            message.setBody(response);
+            //byte[] respBuf = holder.encode();
+
+            //ctx.writeAndFlush(ctx.alloc().buffer().writeBytes(respBuf));
+            ctx.writeAndFlush(message);
+        } catch (Exception e) {
+
+            logger.error("channelRead exception:", e);
+
+        } finally {
+
+            ReferenceCountUtil.release(object);
+        }
+
+
+    }
+
+    /**
+     * 服务端监听到客户端活动
+     * 
+     * @param ctx 连接context
+     * @throws Exception
+     */
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        // 服务端接收到客户端上线通知
+        Channel incoming = ctx.channel();
+        logger.debug("MessageServerHandler:" + incoming.remoteAddress() + "在线");
+        logicManager.online(ctx);
+        ctx.fireChannelActive();
+    }
+
+    /**
+     * 服务端监听到客户端不活动
+     * 
+     * @param ctx 连接context
+     * @throws Exception
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // 服务端接收到客户端掉线通知
+        Channel incoming = ctx.channel();
+        logger.debug("MessageServerHandler:" + incoming.remoteAddress() + "掉线");
+        logicManager.offline(ctx);
+        ctx.fireChannelInactive();
+    }
+    /**
+     * 当服务端的IO 抛出异常时被调用
+     * 
+     * @param ctx 连接context
+     * @param cause
+     * @throws Exception
+     */
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        // super.exceptionCaught(ctx, cause);
+        Channel incoming = ctx.channel();
+        logger.debug("MessageServerHandler异常:{}", incoming.remoteAddress());
+
+        // 异常出现就关闭连接
+        ctx.fireExceptionCaught(cause).close();
+    }
+}

@@ -19,10 +19,11 @@ public class Account {
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
 	private String id;
 	
-	@Column(name="account_name")
-	private String name;
+	@Column(name="user_name")
+	private String userName;
 	@JsonIgnore
-	private String pwd;	
+	private String password;
+
 	private String mobile;
 	
 	private Integer sex;
@@ -82,20 +83,20 @@ public class Account {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
-	public String getPwd() {
-		return pwd;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setPwd(String pwd) {
-		this.pwd = pwd;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getMobile() {
