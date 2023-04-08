@@ -61,8 +61,8 @@ public class ConnectServerApplication implements CommandLineRunner {
 
 	private void initProtobuf() {
 
-		ProtobufParseMap.register(Connect.CmdID.CMD_LOGIN_VALUE, Connect.ActID.ACT_LOGIN_REQ_VALUE,
-				LoginReq::parseFrom, LoginReq.class);
+		//ProtobufParseMap.register(Connect.CmdID.CMD_LOGIN_VALUE, Connect.ActID.ACT_LOGIN_REQ_VALUE,
+		//		LoginReq::parseFrom, LoginReq.class);
 
 	}
 

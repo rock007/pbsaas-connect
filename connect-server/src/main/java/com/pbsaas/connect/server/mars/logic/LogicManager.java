@@ -28,7 +28,7 @@ public class LogicManager {
     public void remove(ChannelHandlerContext ctx) {
 
         Long handleId = ctx.channel().attr(ClientUser.HANDLE_ID).get();
-        Long userId = ctx.channel().attr(ClientUser.USER_ID).get();
+        String userId = ctx.channel().attr(ClientUser.USER_ID).get();
 
         if (handleId != null) {
             // 关闭
@@ -56,7 +56,7 @@ public class LogicManager {
     public void offline(ChannelHandlerContext ctx) {
 
         Long handleId = ctx.channel().attr(ClientUser.HANDLE_ID).get();
-        Long userId = ctx.channel().attr(ClientUser.USER_ID).get();
+        String userId = ctx.channel().attr(ClientUser.USER_ID).get();
 
         if (handleId != null) {
             // 关闭
@@ -81,7 +81,7 @@ public class LogicManager {
     public void online(ChannelHandlerContext ctx) {
 
         Long handleId = ctx.channel().attr(ClientUser.HANDLE_ID).get();
-        Long userId = ctx.channel().attr(ClientUser.USER_ID).get();
+        String userId = ctx.channel().attr(ClientUser.USER_ID).get();
 
         if (handleId != null) {
             // 关闭

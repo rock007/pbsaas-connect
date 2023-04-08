@@ -123,7 +123,7 @@ public class MessageServerHandler extends ChannelInboundHandlerAdapter {
  break;
  ***/
                 default:
-                    logger.warn("暂不支持的服务ID{}", header.getServiceId());
+                    logger.warn("暂不支持的服务ID{}", header.getCmdId());
                     break;
             }
 

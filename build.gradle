@@ -3,8 +3,8 @@ version = '0.0.1-SNAPSHOT'
 
 buildscript {
     ext {
-        springBootVersion = '2.1.6.RELEASE'
-        springCloudVersion ='Greenwich.SR3'
+        springBootVersion = '2.1.13.RELEASE'
+        springCloudVersion ='Greenwich.SR6'
         hazelcastVersion='3.9.4'
         // JDK 版本
         JDKVersion = 11
